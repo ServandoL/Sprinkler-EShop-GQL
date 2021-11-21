@@ -1,0 +1,36 @@
+[{
+  "_id": "d8ba59b7-b7e0-11eb-85cd-d43b04fcbf0b",
+  "fname": "Servando",
+  "lname": "Luviano",
+  "email": "swyswy214@gmail.com",
+  "password": "$5$rounds=535000$ZFgfN5o4kOdRxjBJ$JRIfQuwzgO8luevMMIBpoZAdGKbJ9UyrRENwXXGpeU7",
+  "isAdmin": true
+},{
+  "_id": "a76465c4-d854-11eb-a2bd-d43b04fcbf0b",
+  "fname": "Ramiro",
+  "lname": "The Badass",
+  "email": "thebadass@ramiro.com",
+  "password": "$5$rounds=535000$pS4c2LBHqBwKe.pj$HZmCxSXmZ9Y5VP56Ggomlut1mX45gJtP.oNxsfnYbk3",
+  "isAdmin": false
+},{
+  "_id": "50db1e74-df39-11eb-a63d-d43b04fcbf0b",
+  "fname": "John",
+  "lname": "Doe",
+  "email": "johndoe@test.com",
+  "password": "$5$rounds=535000$tJz5mGBdFdkCG/tz$z2CGxVzN1lfe.NJpE8/rc3ZRt2cC2hNEBYUx8iZAn68",
+  "isAdmin": false
+},{
+  "_id": "87221eea-44b6-11ec-bf13-d43b04fcbf0b",
+  "fname": "MY ACCOUNT",
+  "lname": "test",
+  "email": "RANDOM@EMAIL.COM",
+  "password": "$5$rounds=535000$dqhw6dcV07gR7f4/$1a3CmA5u3iqs1nDcGfvJJPKliAnSGvyS94PCNEozBo7",
+  "isAdmin": false
+},{
+  "_id": "ac2b8668-44b6-11ec-980e-d43b04fcbf0b",
+  "fname": "admin",
+  "lname": "admin",
+  "email": "random.email@email.com",
+  "password": "$5$rounds=535000$g7lIlsyFX.7cmkJk$T0tBPyE22QXAxZpETh02Hfk9wHhzKWh1Y.B3XWOlPLA",
+  "isAdmin": false
+}]
