@@ -1,7 +1,8 @@
-import { gql } from "apollo-server";
+import { gql } from "apollo-server-express";
 
 export const typeDefs = gql`
   type Query {
+
     products(
       _id: ID
       productName: String
@@ -13,8 +14,11 @@ export const typeDefs = gql`
       deleted_by: String
       deleted_date: String
     ): [Product]
+
     productById(id: ID): Product
+
     users(_id: ID, email: String, isAdmin: Boolean): [User]
+
     userById(id: ID): User
   }
 
@@ -47,14 +51,5 @@ export const typeDefs = gql`
     isDeleted: Boolean
     deleted_by: String
     deleted_date: String
-  }
-
-  type OrderHistory {
-    _id: ID!
-    products: [Product]
-    user_id: String
-    quantity: String
-    datetime: String
-    confirmation: String
   }
 `;

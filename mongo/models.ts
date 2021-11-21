@@ -1,7 +1,6 @@
 import { Schema } from 'mongoose';
 
 export const ProductSchema = new Schema({
-    _id: String,
     productName: String,
     price: Number,
     category: String,
@@ -14,7 +13,6 @@ export const ProductSchema = new Schema({
 });
 
 export const UserSchema = new Schema({
-    _id: String,
     fname: String,
     lname: String,
     email: String,
