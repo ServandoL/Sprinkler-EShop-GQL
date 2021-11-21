@@ -13,3 +13,10 @@ export const ProductSchema = new Schema({
     deleted_date: String
 });
 
+export const UserSchema = new Schema({
+    _id: String,
+    fname: String,
+    lname: String,
+    email: String,
+    isAdmin: Boolean
+})

@@ -14,7 +14,7 @@ export class UsersApi extends DataSource {
   }
 
   getUserById(id: string) {
-    const user = _.filter(data, { id: id });
+    const user = _.filter(data, { _id: id });
     return user[0];
   }
 }

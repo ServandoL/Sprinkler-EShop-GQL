@@ -1,20 +1,12 @@
 import mongoose from "mongoose";
-import { ProductSchema } from "./schemas";
+
+const uri = `mongodb+srv://${process.env.mongoUserName}:${process.env.mongoUserPassword}@cluster0.faqfr.mongodb.net/${process.env.mongoDatabase}`;
 
 main().catch((err) => console.log(err));
 
 async function main() {
-  
-  const conn = mongoose
-    .createConnection("mongodb://localhost:27017/web_store", {
-      connectTimeoutMS: 1000,
-    });
-
-
-  const ProductModel = conn.model("Product", ProductSchema);
-
-  const products = await ProductModel.find({
-    _id: "3f304efc-9bdf-11eb-bc13-1b053fbda344",
-  });
-  console.log(products);
+  mongoose
+    .connect(uri)
+    .then(() => console.log("Mongo server is up and running."))
+    .catch(() => console.log("Error while connecting to MongoDB"));
 }

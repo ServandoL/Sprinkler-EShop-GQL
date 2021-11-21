@@ -1,0 +1,7 @@
+{
+    "env": {
+        "mongoDatabase": "web_store",
+        "mongoUserName": "admin",
+        "mongoUserPassword": "Swyisc00l"
+    }
+}

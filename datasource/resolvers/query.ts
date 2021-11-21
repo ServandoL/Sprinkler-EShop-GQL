@@ -1,14 +1,41 @@
+
+import mongoose from "mongoose";
+import { ProductSchema, UserSchema } from "../../mongo/models";
+
+const Product = mongoose.model("Product", ProductSchema);
+const User = mongoose.model("User", UserSchema);
+
 export const Query = {
-  products: (parent: any, args: any, { dataSources }: any, info: any) => {
-    return dataSources.productsApi.getProducts(args);
+  async products(parent: any, args: any, context: any, info: any) {
+    try {
+      const product = await Product.find();
+      return product.map((result) => ({ ...result._doc }));
+    } catch (err) {
+      console.error(err);
+    }
   },
-  productById: (parent: any, { id }: any, { dataSources }: any, info: any) => {
-    return dataSources.productsApi.getProductById(id);
+  async users(parent: any, args: any, context: any, info: any) {
+    try {
+      const user = await User.find();
+      return user.map((result) => ({ ...result._doc }));
+    } catch (err) {
+      console.error(err);
+    }
   },
-  users: (parent: any, args: any, { dataSources }: any, info: any) => {
-    return dataSources.usersApi.getUsers(args);
+  async productById(parent: any, args: any, context: any, info: any) {
+    try {
+      const product = await Product.findOne({ _id: args.id });
+      return { ...product._doc };
+    } catch (err) {
+      console.error(err);
+    }
   },
-  userById: (parent: any, { id }: any, { dataSources }: any, info: any) => {
-    return dataSources.usersApi.getUserById(id);
+  async userById(parent: any, args: any, context: any, info: any) {
+    try {
+      const user = await User.findOne({ _id: args.id });
+      return { ...user._doc };
+    } catch (err) {
+      console.error(err);
+    }
   },
 };

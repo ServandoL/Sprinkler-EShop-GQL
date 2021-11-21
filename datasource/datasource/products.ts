@@ -14,7 +14,7 @@ export class ProductsApi extends DataSource {
   }
 
   getProductById(id: string) {
-    const product = _.filter(data, { id: id });
+    const product = _.filter(data, { _id: id });
     return product[0];
   }
 }
