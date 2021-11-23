@@ -15,11 +15,11 @@ export const typeDefs = gql`
       deleted_date: String
     ): [Product]
 
-    productById(id: ID): Product
+    productById(_id: ID): Product
 
     users(_id: ID, email: String, isAdmin: Boolean): [User]
 
-    userById(id: ID): User
+    userById(_id: ID): User
   }
 
   type Mutation {
@@ -34,6 +34,7 @@ export const typeDefs = gql`
   }
 
   type User {
+    _id: ID!
     fname: String!
     lname: String!
     email: String!

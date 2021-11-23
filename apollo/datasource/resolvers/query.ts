@@ -1,40 +1,74 @@
-import mongoose from "mongoose";
-import { ProductSchema, UserSchema } from "../../../mongo/models";
-
-const Product = mongoose.model("Product", ProductSchema);
-const User = mongoose.model("User", UserSchema);
+import to from "await-to-js";
 
 export const Query = {
-  products: async (parent: any, args: any, context: any, info: any) => {
+  products: async (parent: any, args: any, { dataSources }: any, info: any) => {
+    const client = dataSources.productsApi;
     try {
-      const product = await Product.find();
-      return product.map((result) => ({ ...result._doc }));
+      await client.start();
+      return await client.getAll(args);
     } catch (err) {
-      console.error(err);
+      console.error("Error getting all products", err);
+      return {
+        code: `ERROR`,
+        message: `Error occured getting data.\n${err}`
+      };
+    } finally {
+      client.stop();
     }
   },
-  users: async (parent: any, args: any, context: any, info: any) => {
+  users: async (parent: any, args: any, { dataSources }: any, info: any) => {
+    const client = dataSources.usersApi;
     try {
-      const user = await User.find();
-      return user.map((result) => ({ ...result._doc }));
+      await client.start();
+      return await client.getAll(args);
     } catch (err) {
-      console.error(err);
+      console.error("Error getting all users", err);
+      return {
+        code: `ERROR`,
+        message: `Error occured getting data.\n${err}`
+      };
+    } finally {
+      client.stop();
     }
   },
-  productById: async (parent: any, args: any, context: any, info: any) => {
+  productById: async (
+    parent: any,
+    { _id }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client = dataSources.productsApi;
     try {
-      const product = await Product.findOne({ _id: args.id });
-      return { ...product._doc };
-    } catch (err) {
-      console.error(err);
+      await client.start();
+      return await client.getOneById(_id);
+    } catch(err) {
+      console.error(`Error getting product with id: ${_id}.\n${err}`);
+      return {
+        code: `ERROR`,
+        message: `Error occured getting product with id: ${_id}\n${err}`
+      };
+    } finally {
+      client.stop();
     }
   },
-  userById: async (parent: any, args: any, context: any, info: any) => {
+  userById: async (
+    parent: any,
+    { _id }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client = dataSources.usersApi;
     try {
-      const user = await User.findOne({ _id: args.id });
-      return { ...user._doc };
+      await client.start();
+      return await client.getOneById(_id);
     } catch (err) {
-      console.error(err);
+      console.error(`Error getting user with id: ${_id}.\n${err}`);
+      return {
+        code: `ERROR`,
+        message: `Error occured getting user with id: ${_id}\n${err}`
+      };
+    } finally {
+      client.stop();
     }
   },
 };
