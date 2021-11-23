@@ -1,5 +1,6 @@
+import { ObjectId } from "bson";
 export interface IProduct {
-    _id: String
+    _id: String | ObjectId
     productName: String
     price: Number
     category: String
@@ -12,7 +13,7 @@ export interface IProduct {
 }
 
 export interface IUser {
-    _id: String
+    _id: String | ObjectId
     fname: String
     lname: String
     email: String

@@ -1,5 +1,3 @@
-import to from "await-to-js";
-
 export const Query = {
   products: async (parent: any, args: any, { dataSources }: any, info: any) => {
     const client = dataSources.productsApi;
@@ -48,7 +46,7 @@ export const Query = {
         message: `Error occured getting product with id: ${_id}\n${err}`
       };
     } finally {
-      client.stop();
+      await client.stop();
     }
   },
   userById: async (
