@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-errors";
-import { IProduct, IUser } from "../../../interfaces/interfaces";
+import { IProduct, IUser } from "../../interfaces/interfaces";
 
 export const Mutation = {
   addProduct: async (

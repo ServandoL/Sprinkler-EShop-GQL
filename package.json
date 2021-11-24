@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "apollo": "nodemon index.ts",
-    "mongo": "nodemon mongo/server.ts"
+    "mongo": "nodemon apollo/datasource/mongo/server.ts"
   },
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
 import { ApolloServer } from "apollo-server";
-import { resolvers } from "./apollo/datasource/data-access/resolvers";
-import { typeDefs } from "./apollo/datasource/data-access/schema";
-import { MongoServer } from "./apollo/datasource/datasource/mongo/server";
+import { resolvers } from "./apollo/data-access/resolvers";
+import { typeDefs } from "./apollo/data-access/schema";
+import { MongoServer } from "./apollo/datasource/mongo/server";
 
 const productsCollection = process.env.productsCollection;
 const usersCollection = process.env.usersCollection;
