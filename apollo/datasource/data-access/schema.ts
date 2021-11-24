@@ -29,25 +29,49 @@ export const typeDefs = gql`
       category: String
       brand: String
       stock: Int
-    ): Product
-    addUser(fname: String, lname: String, email: String, isAdmin: Boolean): User
+    ): addProductResponse
+    deleteProduct(_id: ID): deleteProductResponse
+    addUser(fname: String, lname: String, email: String, isAdmin: Boolean): addUserResponse
+    deleteUser(_id: ID): deleteUserResponse
+  }
+
+  type deleteProductResponse {
+    message: String
+    success: Boolean
+  }
+
+  type deleteUserResponse {
+    message: String
+    success: Boolean
+  }
+
+  type addProductResponse {
+    message: String
+    success: Boolean
+    product: Product
+  }
+
+  type addUserResponse {
+    message: String
+    success: Boolean
+    user: User
   }
 
   type User {
     _id: ID!
-    fname: String
-    lname: String
-    email: String
-    isAdmin: Boolean
+    fname: String!
+    lname: String!
+    email: String!
+    isAdmin: Boolean!
   }
 
   type Product {
     _id: ID!
-    productName: String
-    price: Float
-    category: String
-    brand: String
-    stock: Int
+    productName: String!
+    price: Float!
+    category: String!
+    brand: String!
+    stock: Int!
     imageUrl: String
     isDeleted: Boolean
     deleted_by: String

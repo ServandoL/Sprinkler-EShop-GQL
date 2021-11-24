@@ -1,3 +1,6 @@
+import { ApolloError } from "apollo-server-errors";
+import { ObjectID } from "bson";
+import { Console } from "console";
 import { IProduct, IUser } from "../../../interfaces/interfaces";
 
 export const Mutation = {
@@ -10,40 +13,118 @@ export const Mutation = {
     const client = dataSources.productsApi;
     try {
       await client.start();
-      const result =  await client.addOne(args);
-      if (!result.acknowledged) {
-        return result.errors;
+      if (
+        args.productName &&
+        args.price &&
+        args.category &&
+        args.brand &&
+        args.stock
+      ) {
+        const result = await client.addOne(args);
+        if (result.acknowledged) {
+          return {
+            message: 'Product added successfully.',
+            success: true,
+            product: {...args}
+          }
+        }
+        return {
+          message: 'An error occurred trying to add the product.',
+          success: false,
+          product: {...args}
+        }
+      } else {
+        return new ApolloError("All fields must be filled in.");
       }
-      return {
-        ...args,
-        message: `Product inserted successfully.\nID: ${result.insertedId}`
-      }
-    } catch(err) {
-      console.error(`Error inserting a new document.\n${err}`);
-      return {
-        code: 'ERROR',
-        message: `Error occurred creating a new document.\n${err}`
-      };
+    } catch (err) {
+      return new ApolloError("Unable to add product.");
     } finally {
       client.stop();
     }
-
   },
-  // addUser: (parent: any, args: IUser, context: any, info: any) => {
-  //   const { fname, lname, email, isAdmin } = args;
-  //   const user = new User({
-  //     fname,
-  //     lname,
-  //     email,
-  //     isAdmin,
-  //   });
-  //   return user
-  //     .save()
-  //     .then((result) => {
-  //       return { ...result };
-  //     })
-  //     .catch((err: any) => {
-  //       console.error(err);
-  //     });
-  // },
+  addUser: async (
+    parent: any,
+    args: IUser,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client = dataSources.usersApi;
+    try {
+      await client.start();
+      if (args.fname && args.lname && args.email && args.isAdmin !== null) {
+        const result = await client.addOne(args);
+        if (result.acknowledged) {
+          return {
+            message: 'User added successfully.',
+            success: true,
+            user: {...args}
+          }
+        }
+        return {
+          message: 'An error occurred trying to add the user.',
+          success: false,
+          user: {...args}
+        }
+      } else {
+        return new ApolloError("All fields must be filled in.");
+      }
+    } catch (err) {
+      return new ApolloError("Unable to add user.");
+    } finally {
+      client.stop();
+    }
+  },
+  deleteProduct: async (
+    parent: any,
+    { _id }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client = dataSources.productsApi;
+    try {
+      await client.start();
+      const result = await client.softDeleteOne(_id);
+      if (result.modifiedCount > 0) {
+        return {
+          message: 'Product deleted successfully.',
+          success: true
+        }
+      }
+      return {
+        message: 'There was an error deleting this product.',
+        success: false
+      }
+    } catch (err) {
+      return new ApolloError(`Error trying delete ID: ${_id}.\n${err}`);
+    } finally {
+      client.stop();
+    }
+  },
+  deleteUser: async (
+    parent: any,
+    { _id }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client = dataSources.usersApi;
+    try {
+      await client.start();
+      const result = await client.deleteOne(_id);
+      if (result.deletedCount > 0) {
+        console.log('MYCONSOLE',result);
+        return {
+          message: 'User deleted successfully.',
+          success: true,
+        }
+      }
+      return {
+        message: 'There was an error deleting the user.',
+        success: false
+      }
+    } catch (err) {
+      return new ApolloError(`Error trying to delete ID: ${_id}.\n${err}`);
+    } finally {
+      client.stop();
+    }
+  },
 };

@@ -48,4 +48,27 @@ export class MongoServer extends DataSource {
       console.log(`Error occured while inserting: ${err}`);
     }
   }
+
+  async deleteOne(id: any) {
+    try {
+      const query = { _id: id };
+      return await this.database.deleteOne(query);
+    } catch (err) {
+      console.log(`Error occurred trying to delete: ${err}`)
+    }
+  }
+
+  async softDeleteOne(id: any) {
+    try {
+      const query = {_id: id};
+      const deletion = {
+        $set: {
+          isDeleted: true
+        }
+      };
+      return await this.database.updateOne(query, deletion);
+    } catch (err) {
+      console.log(`Error occurred while updating: ${err}`)
+    }
+  }
 }
