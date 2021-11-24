@@ -1,6 +1,4 @@
 import { ApolloError } from "apollo-server-errors";
-import { ObjectID } from "bson";
-import { Console } from "console";
 import { IProduct, IUser } from "../../../interfaces/interfaces";
 
 export const Mutation = {
