@@ -9,7 +9,7 @@ export const Query = {
     } catch (err) {
       return new ApolloError(`Error getting all products.\n${err}`);
     } finally {
-      client.stop();
+      await client.stop();
     }
   },
   users: async (parent: any, args: any, { dataSources }: any, info: any) => {
@@ -18,9 +18,9 @@ export const Query = {
       await client.start();
       return await client.getAll(args);
     } catch (err) {
-      return new ApolloError(`Error getting all users.\n${err}`)
+      return new ApolloError(`Error getting all users.\n${err}`);
     } finally {
-      client.stop();
+      await client.stop();
     }
   },
   productById: async (
@@ -33,8 +33,8 @@ export const Query = {
     try {
       await client.start();
       return await client.getOneById(_id);
-    } catch(err) {
-      return new ApolloError(`Error getting product with ID: ${_id}.\n${err}`)
+    } catch (err) {
+      return new ApolloError(`Error getting product with ID: ${_id}.\n${err}`);
     } finally {
       await client.stop();
     }
@@ -50,9 +50,9 @@ export const Query = {
       await client.start();
       return await client.getOneById(_id);
     } catch (err) {
-      return new ApolloError(`Error getting user with ID: ${_id}.\n${err}`)
+      return new ApolloError(`Error getting user with ID: ${_id}.\n${err}`);
     } finally {
-      client.stop();
+      await client.stop();
     }
   },
 };

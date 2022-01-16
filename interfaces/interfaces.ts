@@ -1,4 +1,5 @@
-import { ObjectId } from "bson";
+import { ObjectId } from "mongodb";
+
 export interface IProduct {
     _id: String | ObjectId
     productName: String
