@@ -62,6 +62,7 @@ export const typeDefs = gql`
     fname: String!
     lname: String!
     email: String!
+    password: String!
     isAdmin: Boolean!
   }
 
