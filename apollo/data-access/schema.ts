@@ -17,7 +17,7 @@ export const typeDefs = gql`
 
     productById(_id: ID): Product
 
-    users(_id: ID, email: String, isAdmin: Boolean): [User]
+    users(_id: ID, email: String, isAdmin: Boolean, password: String): [User]
 
     userById(_id: ID): User
   }
