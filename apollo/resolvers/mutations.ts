@@ -60,6 +60,7 @@ export const Mutation = {
         }
         return {
           message: 'An error occurred trying to add the user.',
+          details: result,
           success: false,
           user: {...args}
         }
@@ -100,14 +101,14 @@ export const Mutation = {
   },
   deleteUser: async (
     parent: any,
-    { _id }: any,
+    { email }: any,
     { dataSources }: any,
     info: any
   ) => {
     const client = dataSources.usersApi;
     try {
       await client.start();
-      const result = await client.deleteOne(_id);
+      const result = await client.deleteOne(email);
       if (result.deletedCount > 0) {
         console.log('MYCONSOLE',result);
         return {
@@ -120,7 +121,7 @@ export const Mutation = {
         success: false
       }
     } catch (err) {
-      return new ApolloError(`Error trying to delete ID: ${_id}.\n${err}`);
+      return new ApolloError(`Error trying to delete user: ${email}.\n${err}`);
     } finally {
       client.stop();
     }

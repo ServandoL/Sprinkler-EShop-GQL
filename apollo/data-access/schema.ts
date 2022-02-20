@@ -31,8 +31,8 @@ export const typeDefs = gql`
       stock: Int
     ): addProductResponse
     deleteProduct(_id: ID): deleteProductResponse
-    addUser(fname: String, lname: String, email: String, isAdmin: Boolean): addUserResponse
-    deleteUser(_id: ID): deleteUserResponse
+    addUser(fname: String, lname: String, email: String, password: String, isAdmin: Boolean): addUserResponse
+    deleteUser(email: String): deleteUserResponse
   }
 
   type deleteProductResponse {
@@ -53,6 +53,7 @@ export const typeDefs = gql`
 
   type addUserResponse {
     message: String
+    details: String
     success: Boolean
     user: User
   }

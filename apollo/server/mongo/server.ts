@@ -1,6 +1,7 @@
 import { DataSource } from "apollo-datasource";
 import _ from "lodash";
 import { Collection, MongoClient } from "mongodb";
+import { IUser } from "../../../interfaces/interfaces";
 
 export class MongoServer extends DataSource {
   uri = `mongodb+srv://${process.env.mongoUserName}:${process.env.mongoUserPassword}@cluster0.faqfr.mongodb.net/${process.env.mongoDatabase}`;
@@ -42,16 +43,24 @@ export class MongoServer extends DataSource {
   }
 
   async addOne(obj: any) {
+    let duplicateExists = null;
     try {
-      return await this.database.insertOne(obj);
+      if (obj.fname && obj.lname && obj.email && obj.password) {
+        duplicateExists = await this.database.findOne({ email: obj.email })
+        if (!duplicateExists) {
+          return await this.database.insertOne(obj);
+        }
+        return "User already exists."
+      }
+      
     } catch (err) {
       console.log(`Error occured while inserting: ${err}`);
     }
   }
 
-  async deleteOne(id: any) {
+  async deleteOne(email: string) {
     try {
-      const query = { _id: id };
+      const query = { email: email };
       return await this.database.deleteOne(query);
     } catch (err) {
       console.log(`Error occurred trying to delete: ${err}`)
