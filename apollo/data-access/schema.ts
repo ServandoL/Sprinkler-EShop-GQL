@@ -2,7 +2,6 @@ import { gql } from "apollo-server";
 
 export const typeDefs = gql`
   type Query {
-
     products(
       _id: ID
       productName: String
@@ -20,6 +19,8 @@ export const typeDefs = gql`
     users(_id: ID, email: String, isAdmin: Boolean, password: String): [User]
 
     userById(_id: ID): User
+
+    cart(user_id: String): [Cart]
   }
 
   type Mutation {
@@ -31,8 +32,29 @@ export const typeDefs = gql`
       stock: Int
     ): addProductResponse
     deleteProduct(_id: ID): deleteProductResponse
-    addUser(fname: String, lname: String, email: String, password: String, isAdmin: Boolean): addUserResponse
+    addUser(
+      fname: String
+      lname: String
+      email: String
+      password: String
+      isAdmin: Boolean
+    ): addUserResponse
     deleteUser(email: String): deleteUserResponse
+    addToCart(
+      user_id: String
+      quantity: Float,
+      productName: String
+      price: Float
+      category: String
+      brand: String
+      stock: Int
+      imageUrl: String
+    ): addToCartResponse
+  }
+
+  type addToCartResponse {
+    message: String
+    success: Boolean
   }
 
   type deleteProductResponse {
@@ -78,5 +100,12 @@ export const typeDefs = gql`
     isDeleted: Boolean
     deleted_by: String
     deleted_date: String
+  }
+
+  type Cart {
+    _id: ID!
+    user_id: String!
+    product: Product!
+    quantity: Int!
   }
 `;

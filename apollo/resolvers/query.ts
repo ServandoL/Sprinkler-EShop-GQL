@@ -12,6 +12,17 @@ export const Query = {
       await client.stop();
     }
   },
+  cart: async(parent: any, { user_id }: any, { dataSources }: any, info: any) =>  {
+    const client = dataSources.cartApi;
+    try {
+      await client.start();
+      return await client.getCart(user_id);
+    } catch (error) {
+      return new ApolloError(`Error getting cart information.\n${error}`);
+    } finally {
+      await client.stop();
+    }
+  },
   users: async (parent: any, args: any, { dataSources }: any, info: any) => {
     const client = dataSources.usersApi;
     try {

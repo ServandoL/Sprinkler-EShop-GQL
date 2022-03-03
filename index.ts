@@ -5,10 +5,12 @@ import { MongoServer } from "./apollo/server/mongo/server";
 
 const productsCollection = process.env.productsCollection;
 const usersCollection = process.env.usersCollection;
+const cartCollection = process.env.cartCollection;
 
 const dataSources = () => ({
   productsApi: new MongoServer(productsCollection),
-  usersApi: new MongoServer(usersCollection)
+  usersApi: new MongoServer(usersCollection),
+  cartApi: new MongoServer(cartCollection)
 })
 
 const port = process.env.port || 4000;

@@ -4,6 +4,7 @@
         "mongoUserName": "admin",
         "mongoUserPassword": "1993NaviTbo1993",
         "productsCollection": "products",
-        "usersCollection": "users"
+        "usersCollection": "users",
+        "cartCollection": "cart"
     }
 }

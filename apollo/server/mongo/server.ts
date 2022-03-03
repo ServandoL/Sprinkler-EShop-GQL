@@ -1,7 +1,7 @@
 import { DataSource } from "apollo-datasource";
 import _ from "lodash";
-import { Collection, MongoClient } from "mongodb";
-import { IUser } from "../../../interfaces/interfaces";
+import { Collection, MongoClient, ObjectId } from "mongodb";
+import { ICart } from "../../../interfaces/interfaces";
 
 export class MongoServer extends DataSource {
   uri = `mongodb+srv://${process.env.mongoUserName}:${process.env.mongoUserPassword}@cluster0.faqfr.mongodb.net/${process.env.mongoDatabase}`;
@@ -33,6 +33,34 @@ export class MongoServer extends DataSource {
     return _.filter(data, args);
   }
 
+  async getCart(user_id: string) {
+    try {
+      return await this.database
+        .find({ user_id: new ObjectId(user_id) })
+        .toArray();
+    } catch (err) {
+      return err;
+    }
+  }
+
+  async addToCart(product: ICart) {
+    const doc: any = {
+      user_id: new ObjectId(product.user_id),
+      quantity: product.quantity,
+      productName: product.productName,
+      price: product.price,
+      category: product.category,
+      brand: product.brand,
+      stock: product.stock,
+      imageUrl: product.imageUrl,
+    }
+    try {
+      return this.database.insertOne(doc);
+    } catch (error) {
+      return error;
+    }
+  }
+
   async getOneById(id: any) {
     try {
       const query = { _id: id };
@@ -46,13 +74,12 @@ export class MongoServer extends DataSource {
     let duplicateExists = null;
     try {
       if (obj.fname && obj.lname && obj.email && obj.password) {
-        duplicateExists = await this.database.findOne({ email: obj.email })
+        duplicateExists = await this.database.findOne({ email: obj.email });
         if (!duplicateExists) {
           return await this.database.insertOne(obj);
         }
-        return "User already exists."
+        return "User already exists.";
       }
-      
     } catch (err) {
       console.log(`Error occured while inserting: ${err}`);
     }
@@ -63,21 +90,21 @@ export class MongoServer extends DataSource {
       const query = { email: email };
       return await this.database.deleteOne(query);
     } catch (err) {
-      console.log(`Error occurred trying to delete: ${err}`)
+      console.log(`Error occurred trying to delete: ${err}`);
     }
   }
 
   async softDeleteOne(id: any) {
     try {
-      const query = {_id: id};
+      const query = { _id: id };
       const deletion = {
         $set: {
-          isDeleted: true
-        }
+          isDeleted: true,
+        },
       };
       return await this.database.updateOne(query, deletion);
     } catch (err) {
-      console.log(`Error occurred while updating: ${err}`)
+      console.log(`Error occurred while updating: ${err}`);
     }
   }
 }

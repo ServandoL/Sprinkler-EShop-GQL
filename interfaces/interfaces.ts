@@ -21,3 +21,15 @@ export interface IUser {
   password: Boolean;
   isAdmin: Boolean;
 }
+
+export interface ICart {
+  _id: ObjectId;
+  user_id: string;
+  productName: string;
+  price: number;
+  category: string;
+  brand: string;
+  stock: number;
+  imageUrl: string;
+  quantity: number;
+}

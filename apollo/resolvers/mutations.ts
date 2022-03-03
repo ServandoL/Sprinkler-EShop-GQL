@@ -1,5 +1,5 @@
 import { ApolloError } from "apollo-server-errors";
-import { IProduct, IUser } from "../../interfaces/interfaces";
+import { ICart, IProduct, IUser } from "../../interfaces/interfaces";
 
 export const Mutation = {
   addProduct: async (
@@ -37,7 +37,47 @@ export const Mutation = {
     } catch (err) {
       return new ApolloError("Unable to add product.");
     } finally {
-      client.stop();
+      await client.stop();
+    }
+  },
+  addToCart: async (parent: any, args: ICart, { dataSources }: any, info: any) => {
+    const client = dataSources.cartApi;
+    const product = {
+      productName: args.productName,
+      price: args.price,
+      category: args.category,
+      brand: args.brand,
+      stock: args.stock,
+      imageUrl: args.imageUrl,
+    };
+    try {
+      await client.start();
+      console.log(args)
+      if (args.user_id && product && args.quantity > 0) {
+        if (args.quantity > product.stock) {
+          return {
+            message: 'Error: Quantity is greater than available amount.',
+            success: false
+          }
+        } else {
+          const result = await client.addToCart(args)
+          if (result.acknowledged) {
+            return {
+              message: 'Added to cart successfully.',
+              success: true
+            }
+          }
+        }
+      } else {
+        return {
+          message: 'Error: An error occurred while trying to add to the cart.',
+          success: false
+        }
+      }
+    } catch (error) {
+      return new ApolloError(`An error occurred adding to the cart. ${error}`)
+    } finally {
+      await client.stop();
     }
   },
   addUser: async (
@@ -70,7 +110,7 @@ export const Mutation = {
     } catch (err) {
       return new ApolloError("Unable to add user.");
     } finally {
-      client.stop();
+      await client.stop();
     }
   },
   deleteProduct: async (
@@ -96,7 +136,7 @@ export const Mutation = {
     } catch (err) {
       return new ApolloError(`Error trying delete ID: ${_id}.\n${err}`);
     } finally {
-      client.stop();
+      await client.stop();
     }
   },
   deleteUser: async (
@@ -123,7 +163,7 @@ export const Mutation = {
     } catch (err) {
       return new ApolloError(`Error trying to delete user: ${email}.\n${err}`);
     } finally {
-      client.stop();
+      await client.stop();
     }
   },
 };
