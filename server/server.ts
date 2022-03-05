@@ -1,7 +1,13 @@
-import { DataSource } from "apollo-datasource";
-import _ from "lodash";
-import { Collection, MongoClient, ObjectId } from "mongodb";
-import { ICart } from "../../../interfaces/interfaces";
+import { DataSource } from 'apollo-datasource';
+import _ from 'lodash';
+import {
+  Collection,
+  Document,
+  MongoClient,
+  ObjectId,
+  UpdateResult,
+} from 'mongodb';
+import { ICart } from '../interfaces/interfaces';
 
 export class MongoServer extends DataSource {
   uri = `mongodb+srv://${process.env.mongoUserName}:${process.env.mongoUserPassword}@cluster0.faqfr.mongodb.net/${process.env.mongoDatabase}`;
@@ -19,9 +25,9 @@ export class MongoServer extends DataSource {
     await this.client.connect();
     this.database = this.client.db(this.dbName).collection(this.collection);
     console.log(`Connected successfully to MongoDB: ${this.dbName}`);
-    this.client.on("commandStarted", (event) => console.debug(event));
-    this.client.on("commandSucceeded", (event) => console.debug(event));
-    this.client.on("commandFailed", (event) => console.debug(event));
+    this.client.on('commandStarted', (event) => console.debug(event));
+    this.client.on('commandSucceeded', (event) => console.debug(event));
+    this.client.on('commandFailed', (event) => console.debug(event));
   }
 
   async stop() {
@@ -43,7 +49,7 @@ export class MongoServer extends DataSource {
     }
   }
 
-  async addToCart(product: ICart) {
+  async addToCart(product: ICart): Promise<UpdateResult | Document | unknown> {
     const doc: any = {
       user_id: new ObjectId(product.user_id),
       quantity: product.quantity,
@@ -53,10 +59,48 @@ export class MongoServer extends DataSource {
       brand: product.brand,
       stock: product.stock,
       imageUrl: product.imageUrl,
-    }
+    };
     try {
       return this.database.insertOne(doc);
     } catch (error) {
+      return error;
+    }
+  }
+
+  async updateCartQuantity(product: ICart) {
+    try {
+      const document = await this.database.findOne({
+        user_id: new ObjectId(product.user_id),
+        productName: product.productName,
+      });
+      if (product.quantity > document?.stock) {
+        return 'Error: Quantity cannot be greater than available stock amount.';
+      } else {
+        return await this.database.updateOne(
+          {
+            user_id: new ObjectId(product.user_id),
+            productName: product.productName,
+          },
+          {
+            $set: {
+              quantity: product.quantity,
+            },
+          }
+        );
+      }
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async removeFromCart(product: ICart) {
+    try {
+      return await this.database.deleteOne({
+        user_id: new ObjectId(product.user_id),
+        productName: product.productName,
+      });
+    } catch (error) {
+      console.log(error);
       return error;
     }
   }
@@ -78,7 +122,7 @@ export class MongoServer extends DataSource {
         if (!duplicateExists) {
           return await this.database.insertOne(obj);
         }
-        return "User already exists.";
+        return 'User already exists.';
       }
     } catch (err) {
       console.log(`Error occured while inserting: ${err}`);
