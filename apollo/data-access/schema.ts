@@ -126,7 +126,12 @@ export const typeDefs = gql`
   type Cart {
     _id: ID!
     user_id: String!
-    product: Product!
+    productName: String!
+    price: Float!
+    category: String!
+    brand: String!
+    stock: Int!
+    imageUrl: String
     quantity: Int!
   }
 `;
