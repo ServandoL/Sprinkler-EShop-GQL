@@ -49,6 +49,13 @@ export class MongoServer extends DataSource {
 
   async addToCart(product: ICart): Promise<UpdateResult | Document | unknown> {
     try {
+      const existingProduct = await this.database.findOne({
+        user_id: product.user_id,
+        productName: product.productName,
+      });
+      if (existingProduct) {
+        return await this.updateCartQuantity(product);
+      }
       return this.database.insertOne(product);
     } catch (error) {
       return error;
