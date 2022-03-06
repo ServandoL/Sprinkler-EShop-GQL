@@ -23,7 +23,6 @@ export interface IUser {
 }
 
 export interface ICart {
-  _id: ObjectId;
   user_id: string;
   productName: string;
   price: number;

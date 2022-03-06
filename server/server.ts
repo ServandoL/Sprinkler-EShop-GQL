@@ -41,27 +41,15 @@ export class MongoServer extends DataSource {
 
   async getCart(user_id: string) {
     try {
-      return await this.database
-        .find({ user_id: new ObjectId(user_id) })
-        .toArray();
+      return await this.database.find({ user_id: user_id }).toArray();
     } catch (err) {
       return err;
     }
   }
 
   async addToCart(product: ICart): Promise<UpdateResult | Document | unknown> {
-    const doc: any = {
-      user_id: new ObjectId(product.user_id),
-      quantity: product.quantity,
-      productName: product.productName,
-      price: product.price,
-      category: product.category,
-      brand: product.brand,
-      stock: product.stock,
-      imageUrl: product.imageUrl,
-    };
     try {
-      return this.database.insertOne(doc);
+      return this.database.insertOne(product);
     } catch (error) {
       return error;
     }
@@ -70,7 +58,7 @@ export class MongoServer extends DataSource {
   async updateCartQuantity(product: ICart) {
     try {
       const document = await this.database.findOne({
-        user_id: new ObjectId(product.user_id),
+        user_id: product.user_id,
         productName: product.productName,
       });
       if (product.quantity > document?.stock) {
@@ -78,7 +66,7 @@ export class MongoServer extends DataSource {
       } else {
         return await this.database.updateOne(
           {
-            user_id: new ObjectId(product.user_id),
+            user_id: product.user_id,
             productName: product.productName,
           },
           {
@@ -96,7 +84,7 @@ export class MongoServer extends DataSource {
   async removeFromCart(product: ICart) {
     try {
       return await this.database.deleteOne({
-        user_id: new ObjectId(product.user_id),
+        user_id: product.user_id,
         productName: product.productName,
       });
     } catch (error) {

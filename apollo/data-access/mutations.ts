@@ -1,5 +1,4 @@
 import { ApolloError } from 'apollo-server';
-import { Document, UpdateResult } from 'mongodb';
 import { ICart, IProduct, IUser } from '../../interfaces/interfaces';
 import { MongoServer } from '../../server/server';
 
@@ -80,6 +79,8 @@ export const Mutation = {
     const client: MongoServer = dataSources.cartApi;
     try {
       await client.start();
+      console.log('the args: ', args);
+      console.log('the user:', args.user_id);
       if (args.user_id && args.quantity > 0) {
         if (args.quantity > args.stock) {
           return {

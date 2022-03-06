@@ -45,7 +45,7 @@ export const typeDefs = gql`
 
     addToCart(
       user_id: String
-      quantity: Float
+      quantity: Int
       productName: String
       price: Float
       category: String
