@@ -76,6 +76,7 @@ export const typeDefs = gql`
   type addToCartResponse {
     message: String
     success: Boolean
+    product: Cart
   }
 
   type deleteProductResponse {

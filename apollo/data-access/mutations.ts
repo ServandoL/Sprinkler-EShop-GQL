@@ -86,6 +86,7 @@ export const Mutation = {
           return {
             message: 'Error: Quantity is greater than available amount.',
             success: false,
+            product: { ...args },
           };
         } else {
           const result: any = await client.addToCart(args);
@@ -93,6 +94,7 @@ export const Mutation = {
             return {
               message: 'Added to cart successfully.',
               success: true,
+              product: { ...args },
             };
           }
         }
