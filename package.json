@@ -4,8 +4,7 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "apollo": "nodemon apollo/apollo.ts",
-    "mongo": "nodemon server/server.ts"
+    "start": "nodemon index.ts"
   },
   "repository": {
     "type": "git",
