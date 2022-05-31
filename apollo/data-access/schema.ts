@@ -2,7 +2,7 @@ import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
   type Query {
-    cart(user_id: String): [Cart]
+    cart(user_id: String): getCartResponse
 
     products(
       _id: ID
@@ -23,6 +23,8 @@ export const typeDefs = gql`
   }
 
   type Mutation {
+    saveCart(cart: SaveCartRequest): saveCartResponse
+
     addProduct(
       productName: String
       price: Float
@@ -63,12 +65,23 @@ export const typeDefs = gql`
     ): updateCartQuantityResponse
   }
 
+  type getCartResponse {
+    cart: [Cart]
+    user_id: String
+    createdDate: String
+  }
+
   type updateCartQuantityResponse {
     message: String
     success: Boolean
   }
 
   type removeFromCartResponse {
+    message: String
+    success: Boolean
+  }
+
+  type saveCartResponse {
     message: String
     success: Boolean
   }
@@ -125,7 +138,7 @@ export const typeDefs = gql`
   }
 
   type Cart {
-    _id: ID!
+    _id: ID
     user_id: String!
     productName: String!
     price: Float!
@@ -134,5 +147,21 @@ export const typeDefs = gql`
     stock: Int!
     imageUrl: String
     quantity: Int!
+  }
+
+  input CartInput {
+    user_id: String!
+    productName: String!
+    price: Float!
+    category: String!
+    brand: String!
+    stock: Int!
+    imageUrl: String
+    quantity: Int!
+  }
+
+  input SaveCartRequest {
+    cart: [CartInput]
+    user_id: String
   }
 `;

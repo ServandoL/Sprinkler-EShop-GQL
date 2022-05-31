@@ -32,3 +32,8 @@ export interface ICart {
   imageUrl: string;
   quantity: number;
 }
+
+export interface SaveCartRequest {
+  cart: ICart[];
+  user_id: string;
+}

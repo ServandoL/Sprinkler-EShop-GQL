@@ -1,10 +1,10 @@
 {
-    "env": {
-        "mongoDatabase": "web_store",
-        "mongoUserName": "admin",
-        "mongoUserPassword": "1993NaviTbo1993",
-        "productsCollection": "products",
-        "usersCollection": "users",
-        "cartCollection": "cart"
-    }
+  "env": {
+    "mongoDatabase": "web_store",
+    "mongoUserName": "admin",
+    "connectionString": "mongodb+srv://admin:Sj0ov1TdKP220Rys@cluster0.faqfr.mongodb.net/test?authSource=admin&replicaSet=atlas-tlxzz4-shard-0&readPreference=primary&ssl=true",
+    "productsCollection": "products",
+    "usersCollection": "users",
+    "cartCollection": "cart"
+  }
 }

@@ -1,5 +1,11 @@
 import { ApolloError } from 'apollo-server';
-import { ICart, IProduct, IUser } from '../../interfaces/interfaces';
+import { InsertOneResult } from 'mongodb';
+import {
+  ICart,
+  IProduct,
+  IUser,
+  SaveCartRequest,
+} from '../../interfaces/interfaces';
 import { MongoServer } from '../../server/server';
 
 export const Mutation = {
@@ -70,6 +76,37 @@ export const Mutation = {
       await client.stop();
     }
   },
+  saveCart: async (
+    parent: any,
+    { cart }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client: MongoServer = dataSources.cartApi;
+    try {
+      await client.start();
+      const result = (await client.saveCart(cart)) as InsertOneResult;
+      if (result?.insertedId) {
+        return {
+          message: 'Successfully saved your cart.',
+          success: true,
+        };
+      } else {
+        return {
+          message: 'Could not save your cart.',
+          success: false,
+        };
+      }
+    } catch (error: unknown) {
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: error,
+        })}`
+      );
+    } finally {
+      await client.stop();
+    }
+  },
   addToCart: async (
     parent: any,
     args: ICart,
@@ -79,8 +116,6 @@ export const Mutation = {
     const client: MongoServer = dataSources.cartApi;
     try {
       await client.start();
-      console.log('the args: ', args);
-      console.log('the user:', args.user_id);
       if (args.user_id && args.quantity > 0) {
         if (args.quantity > args.stock) {
           return {

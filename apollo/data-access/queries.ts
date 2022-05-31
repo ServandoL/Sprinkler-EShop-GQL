@@ -1,4 +1,5 @@
 import { ApolloError } from 'apollo-server';
+import { MongoServer } from '../../server/server';
 
 export const Query = {
   cart: async (
@@ -7,10 +8,13 @@ export const Query = {
     { dataSources }: any,
     info: any
   ) => {
-    const client = dataSources.cartApi;
+    const client: MongoServer = dataSources.cartApi;
     try {
       await client.start();
-      return await client.getCart(user_id);
+      const result = await client.getCart(user_id);
+      if (result) {
+        return result;
+      }
     } catch (error) {
       return new ApolloError(`Error getting cart information.\n${error}`);
     } finally {
