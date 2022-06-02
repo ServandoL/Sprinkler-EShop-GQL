@@ -56,7 +56,7 @@ export const typeDefs = gql`
       imageUrl: String
     ): addToCartResponse
 
-    removeFromCart(user_id: String, productName: String): removeFromCartResponse
+    clearCart(user_id: String): removeFromCartResponse
 
     updateCartQuantity(
       user_id: String

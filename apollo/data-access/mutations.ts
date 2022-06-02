@@ -1,5 +1,5 @@
 import { ApolloError } from 'apollo-server';
-import { InsertOneResult } from 'mongodb';
+import { InsertOneResult, UpdateResult } from 'mongodb';
 import {
   ICart,
   IProduct,
@@ -45,32 +45,31 @@ export const Mutation = {
       client.stop();
     }
   },
-  removeFromCart: async (
+  clearCart: async (
     parent: any,
-    args: ICart,
+    { user_id }: any,
     { dataSources }: any,
     info: any
   ) => {
     const client: MongoServer = dataSources.cartApi;
-
     try {
       await client.start();
-      const result: any = await client.removeFromCart(args);
-      if (result.deletedCount === 1) {
+      const result: any = await client.clearCart(user_id);
+      if (result?.deletedCount === 1) {
         return {
-          message: 'Successfully removed the item from your cart.',
+          message: 'Successfully deleted your cart.',
           success: true,
         };
       } else {
         return {
           message:
-            'There was an error removing the item from your cart. Please try again.',
+            'There was an error trying to delete your cart. Please try again.',
           success: false,
         };
       }
     } catch (error) {
       return new ApolloError(
-        `An error occurred removing from the cart. ${error}`
+        `An error occurred while trying to delete your cart. ${error}`
       );
     } finally {
       await client.stop();
@@ -85,8 +84,9 @@ export const Mutation = {
     const client: MongoServer = dataSources.cartApi;
     try {
       await client.start();
-      const result = (await client.saveCart(cart)) as InsertOneResult;
-      if (result?.insertedId) {
+      const result = (await client.saveCart(cart)) as UpdateResult;
+      console.log('result', result);
+      if (result?.upsertedId || result.modifiedCount) {
         return {
           message: 'Successfully saved your cart.',
           success: true,

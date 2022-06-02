@@ -48,14 +48,22 @@ export class MongoServer extends DataSource {
     }
   }
 
-  async saveCart(request: SaveCartRequest): Promise<InsertOneResult | any> {
+  async saveCart(request: SaveCartRequest): Promise<UpdateResult> {
     try {
-      return await this.database.insertOne({
-        cart: request.cart,
-        email: request.user_id,
-        createdDate: new Date(),
-      });
-    } catch (error: unknown) {
+      return await this.database.updateOne(
+        { email: request.user_id },
+        {
+          $set: {
+            cart: [...request.cart],
+            email: request.user_id,
+            createdDate: new Date(),
+          },
+        },
+        {
+          upsert: true,
+        }
+      );
+    } catch (error: any) {
       return error;
     }
   }
@@ -101,11 +109,10 @@ export class MongoServer extends DataSource {
     }
   }
 
-  async removeFromCart(product: ICart) {
+  async clearCart(email: string) {
     try {
       return await this.database.deleteOne({
-        user_id: product.user_id,
-        productName: product.productName,
+        email: email,
       });
     } catch (error) {
       console.log(error);
