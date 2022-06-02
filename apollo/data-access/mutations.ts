@@ -31,10 +31,9 @@ export const Mutation = {
             success: true,
           };
         } else {
-          return {
-            message: result,
-            success: false,
-          };
+          return new ApolloError(
+            `An error occurred while trying to update your cart.`
+          );
         }
       }
     } catch (error) {
@@ -61,11 +60,9 @@ export const Mutation = {
           success: true,
         };
       } else {
-        return {
-          message:
-            'There was an error trying to delete your cart. Please try again.',
-          success: false,
-        };
+        return new ApolloError(
+          `An error occurred while trying to delete your cart.`
+        );
       }
     } catch (error) {
       return new ApolloError(
@@ -92,10 +89,9 @@ export const Mutation = {
           success: true,
         };
       } else {
-        return {
-          message: 'Could not save your cart.',
-          success: false,
-        };
+        return new ApolloError(
+          `An error occurred while trying to save your cart.`
+        );
       }
     } catch (error: unknown) {
       return new ApolloError(
