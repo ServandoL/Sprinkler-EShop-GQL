@@ -8,6 +8,7 @@ import {
   MongoClient,
   ObjectId,
   UpdateResult,
+  WithId,
 } from 'mongodb';
 import {
   ICart,
@@ -51,7 +52,7 @@ export class MongoServer extends DataSource {
       return await this.database.findOne({ email: user_id });
     } catch (err) {
       return new ApolloError(
-        `An error occured trying to save your cart. ${JSON.stringify({
+        `An error occurred while retrieving your cart. ${JSON.stringify({
           error: err,
         })}`
       );
@@ -94,7 +95,7 @@ export class MongoServer extends DataSource {
       return this.database.insertOne(product);
     } catch (error) {
       return new ApolloError(
-        `An error occured trying to save your cart. ${JSON.stringify({
+        `An error occured trying update your cart. ${JSON.stringify({
           error: error,
         })}`
       );
@@ -124,35 +125,43 @@ export class MongoServer extends DataSource {
       }
     } catch (error) {
       return new ApolloError(
-        `An error occured trying to save your cart. ${JSON.stringify({
+        `An error occured trying to update your cart. ${JSON.stringify({
           error: error,
         })}`
       );
     }
   }
 
-  async checkout(order: Order) {
+  async checkout(order: Order, productClient: MongoServer) {
     try {
+      for (const product of order.order) {
+        console.log('product', product);
+        const found: WithId<Document> | null =
+          await productClient.database.findOne({
+            productName: product.productName,
+          });
+        if (found !== null) {
+          console.log('found', found);
+          await productClient.database.updateOne(
+            { _id: found._id },
+            {
+              $set: {
+                stock: found.stock - product.quantity,
+              },
+            }
+          );
+        } else {
+          return new ApolloError(`Ooops! This product does not exist.`);
+        }
+      }
       return await this.database.insertOne({
         ...order,
       });
     } catch (error: any) {
       return new ApolloError(
-        `An error occured trying to save your cart. ${JSON.stringify({
+        `An error occured while processing your order. ${JSON.stringify({
           error: error,
         })}`
-      );
-    }
-  }
-
-  async updateQuantities(products: IProduct[]) {
-    try {
-      await this.database.aggregate([]);
-    } catch (error) {
-      return new ApolloError(
-        `An error occurred while processing yoru order. ${JSON.stringify(
-          error
-        )}`
       );
     }
   }
@@ -165,7 +174,7 @@ export class MongoServer extends DataSource {
     } catch (error) {
       console.log(error);
       return new ApolloError(
-        `An error occured trying to save your cart. ${JSON.stringify({
+        `An error occured trying clear your cart. ${JSON.stringify({
           error: error,
         })}`
       );
@@ -202,7 +211,7 @@ export class MongoServer extends DataSource {
       return await this.database.deleteOne(query);
     } catch (err) {
       return new ApolloError(
-        `An error occured trying to save your cart. ${JSON.stringify({
+        `An error occured deleting this item. ${JSON.stringify({
           error: err,
         })}`
       );
@@ -220,7 +229,7 @@ export class MongoServer extends DataSource {
       return await this.database.updateOne(query, deletion);
     } catch (err) {
       return new ApolloError(
-        `An error occured trying to save your cart. ${JSON.stringify({
+        `An error occured deleting this item. ${JSON.stringify({
           error: err,
         })}`
       );

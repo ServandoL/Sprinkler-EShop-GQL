@@ -74,13 +74,22 @@ export const Mutation = {
     { dataSources }: any,
     info: any
   ) => {
-    const client: MongoServer = dataSources.checkoutApi;
+    const checkoutClient: MongoServer = dataSources.checkoutApi;
+    const cartClient: MongoServer = dataSources.cartApi;
+    const productClient: MongoServer = dataSources.productsApi;
     try {
-      await client.start();
-      const result = (await client.checkout(
-        checkoutRequest
+      await checkoutClient.start();
+      await cartClient.start();
+      await productClient.start();
+
+      const result = (await checkoutClient.checkout(
+        checkoutRequest,
+        productClient
       )) as InsertOneResult;
+
       if (result.insertedId) {
+        await cartClient.clearCart(checkoutRequest.email);
+
         return {
           message: 'Order processed successfully.',
           success: true,
@@ -93,7 +102,9 @@ export const Mutation = {
     } catch (error: any) {
       return error;
     } finally {
-      await client.stop();
+      await checkoutClient.stop();
+      await cartClient.stop();
+      await productClient.stop();
     }
   },
   saveCart: async (
