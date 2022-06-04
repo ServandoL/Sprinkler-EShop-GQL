@@ -1,4 +1,5 @@
 import { DataSource } from 'apollo-datasource';
+import { ApolloError } from 'apollo-server';
 import _ from 'lodash';
 import {
   Collection,
@@ -8,7 +9,12 @@ import {
   ObjectId,
   UpdateResult,
 } from 'mongodb';
-import { ICart, SaveCartRequest } from '../interfaces/interfaces';
+import {
+  ICart,
+  IProduct,
+  Order,
+  SaveCartRequest,
+} from '../interfaces/interfaces';
 
 export class MongoServer extends DataSource {
   uri = process.env.connectionString || '';
@@ -44,11 +50,15 @@ export class MongoServer extends DataSource {
     try {
       return await this.database.findOne({ email: user_id });
     } catch (err) {
-      return err;
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: err,
+        })}`
+      );
     }
   }
 
-  async saveCart(request: SaveCartRequest): Promise<UpdateResult> {
+  async saveCart(request: SaveCartRequest): Promise<UpdateResult | any> {
     try {
       return await this.database.updateOne(
         { email: request.user_id },
@@ -64,7 +74,11 @@ export class MongoServer extends DataSource {
         }
       );
     } catch (error: any) {
-      return error;
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: error,
+        })}`
+      );
     }
   }
 
@@ -79,7 +93,11 @@ export class MongoServer extends DataSource {
       }
       return this.database.insertOne(product);
     } catch (error) {
-      return error;
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: error,
+        })}`
+      );
     }
   }
 
@@ -105,7 +123,37 @@ export class MongoServer extends DataSource {
         );
       }
     } catch (error) {
-      return error;
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: error,
+        })}`
+      );
+    }
+  }
+
+  async checkout(order: Order) {
+    try {
+      return await this.database.insertOne({
+        ...order,
+      });
+    } catch (error: any) {
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: error,
+        })}`
+      );
+    }
+  }
+
+  async updateQuantities(products: IProduct[]) {
+    try {
+      await this.database.aggregate([]);
+    } catch (error) {
+      return new ApolloError(
+        `An error occurred while processing yoru order. ${JSON.stringify(
+          error
+        )}`
+      );
     }
   }
 
@@ -116,7 +164,11 @@ export class MongoServer extends DataSource {
       });
     } catch (error) {
       console.log(error);
-      return error;
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: error,
+        })}`
+      );
     }
   }
 
@@ -149,7 +201,11 @@ export class MongoServer extends DataSource {
       const query = { email: email };
       return await this.database.deleteOne(query);
     } catch (err) {
-      console.log(`Error occurred trying to delete: ${err}`);
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: err,
+        })}`
+      );
     }
   }
 
@@ -163,7 +219,11 @@ export class MongoServer extends DataSource {
       };
       return await this.database.updateOne(query, deletion);
     } catch (err) {
-      console.log(`Error occurred while updating: ${err}`);
+      return new ApolloError(
+        `An error occured trying to save your cart. ${JSON.stringify({
+          error: err,
+        })}`
+      );
     }
   }
 }

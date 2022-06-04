@@ -6,11 +6,13 @@ import { MongoServer } from './server/server';
 const productsCollection = process.env.productsCollection;
 const usersCollection = process.env.usersCollection;
 const cartCollection = process.env.cartCollection;
+const ordersCollection = process.env.ordersCollection;
 
 const dataSources = () => ({
   productsApi: new MongoServer(productsCollection),
   usersApi: new MongoServer(usersCollection),
   cartApi: new MongoServer(cartCollection),
+  checkoutApi: new MongoServer(ordersCollection),
 });
 
 const port = process.env.port || 4000;

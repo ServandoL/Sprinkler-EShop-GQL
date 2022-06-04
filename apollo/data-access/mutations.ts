@@ -37,9 +37,7 @@ export const Mutation = {
         }
       }
     } catch (error) {
-      return new ApolloError(
-        `An error occurred while updating your cart. ${error}`
-      );
+      return error;
     } finally {
       client.stop();
     }
@@ -65,9 +63,35 @@ export const Mutation = {
         );
       }
     } catch (error) {
-      return new ApolloError(
-        `An error occurred while trying to delete your cart. ${error}`
-      );
+      return error;
+    } finally {
+      await client.stop();
+    }
+  },
+  checkout: async (
+    parent: any,
+    { checkoutRequest }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client: MongoServer = dataSources.checkoutApi;
+    try {
+      await client.start();
+      const result = (await client.checkout(
+        checkoutRequest
+      )) as InsertOneResult;
+      if (result.insertedId) {
+        return {
+          message: 'Order processed successfully.',
+          success: true,
+        };
+      } else {
+        return new ApolloError(
+          `An error occurred trying to process your order.`
+        );
+      }
+    } catch (error: any) {
+      return error;
     } finally {
       await client.stop();
     }
@@ -94,11 +118,7 @@ export const Mutation = {
         );
       }
     } catch (error: unknown) {
-      return new ApolloError(
-        `An error occured trying to save your cart. ${JSON.stringify({
-          error: error,
-        })}`
-      );
+      return error;
     } finally {
       await client.stop();
     }
@@ -136,7 +156,7 @@ export const Mutation = {
         };
       }
     } catch (error) {
-      return new ApolloError(`An error occurred adding to the cart. ${error}`);
+      return error;
     } finally {
       await client.stop();
     }
@@ -174,7 +194,7 @@ export const Mutation = {
         return new ApolloError('All fields must be filled in.');
       }
     } catch (err) {
-      return new ApolloError('Unable to add product.');
+      return err;
     } finally {
       await client.stop();
     }
@@ -200,7 +220,7 @@ export const Mutation = {
         success: false,
       };
     } catch (err) {
-      return new ApolloError(`Error trying delete ID: ${_id}.\n${err}`);
+      return err;
     } finally {
       await client.stop();
     }
@@ -233,7 +253,7 @@ export const Mutation = {
         return new ApolloError('All fields must be filled in.');
       }
     } catch (err) {
-      return new ApolloError('Unable to add user.');
+      return err;
     } finally {
       await client.stop();
     }
@@ -260,7 +280,7 @@ export const Mutation = {
         success: false,
       };
     } catch (err) {
-      return new ApolloError(`Error trying to delete user: ${email}.\n${err}`);
+      return err;
     } finally {
       await client.stop();
     }

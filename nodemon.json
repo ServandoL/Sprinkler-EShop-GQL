@@ -5,6 +5,7 @@
     "connectionString": "mongodb+srv://admin:Sj0ov1TdKP220Rys@cluster0.faqfr.mongodb.net/test?authSource=admin&replicaSet=atlas-tlxzz4-shard-0&readPreference=primary&ssl=true",
     "productsCollection": "products",
     "usersCollection": "users",
-    "cartCollection": "cart"
+    "cartCollection": "cart",
+    "ordersCollection": "orders"
   }
 }

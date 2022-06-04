@@ -16,7 +16,7 @@ export const Query = {
         return result;
       }
     } catch (error) {
-      return new ApolloError(`Error getting cart information.\n${error}`);
+      return error;
     } finally {
       await client.stop();
     }
@@ -27,7 +27,7 @@ export const Query = {
       await client.start();
       return await client.getAll(args);
     } catch (err) {
-      return new ApolloError(`Error getting all products.\n${err}`);
+      return err;
     } finally {
       await client.stop();
     }
@@ -43,7 +43,7 @@ export const Query = {
       await client.start();
       return await client.getOneById(_id);
     } catch (err) {
-      return new ApolloError(`Error getting product with ID: ${_id}.\n${err}`);
+      return err;
     } finally {
       await client.stop();
     }
@@ -54,7 +54,7 @@ export const Query = {
       await client.start();
       return await client.getAll(args);
     } catch (err) {
-      return new ApolloError(`Error getting all users.\n${err}`);
+      return err;
     } finally {
       await client.stop();
     }
@@ -71,7 +71,7 @@ export const Query = {
       await client.start();
       return await client.getOneById(_id);
     } catch (err) {
-      return new ApolloError(`Error getting user with ID: ${_id}.\n${err}`);
+      return err;
     } finally {
       await client.stop();
     }

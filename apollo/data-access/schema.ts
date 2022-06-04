@@ -23,6 +23,8 @@ export const typeDefs = gql`
   }
 
   type Mutation {
+    checkout(checkoutRequest: Order): checkoutResponse
+
     saveCart(cart: SaveCartRequest): saveCartResponse
 
     addProduct(
@@ -82,6 +84,11 @@ export const typeDefs = gql`
   }
 
   type saveCartResponse {
+    message: String
+    success: Boolean
+  }
+
+  type checkoutResponse {
     message: String
     success: Boolean
   }
@@ -150,18 +157,47 @@ export const typeDefs = gql`
   }
 
   input CartInput {
-    user_id: String!
-    productName: String!
-    price: Float!
-    category: String!
-    brand: String!
-    stock: Int!
+    user_id: String
+    productName: String
+    price: Float
+    category: String
+    brand: String
+    stock: Int
     imageUrl: String
-    quantity: Int!
+    quantity: Int
   }
 
   input SaveCartRequest {
     cart: [CartInput]
     user_id: String
+  }
+
+  input CheckoutRequest {
+    order: Order
+  }
+
+  input Order {
+    order: [CartInput]
+    shipping: Shipping
+    payment: Payment
+    email: String
+    orderedDate: String
+    total: Float
+    orderId: String
+  }
+
+  input Shipping {
+    address: String
+    address2: String
+    city: String
+    state: String
+    zipCode: String
+  }
+
+  input Payment {
+    cardNumber: String
+    month: String
+    year: String
+    cvv: String
   }
 `;
