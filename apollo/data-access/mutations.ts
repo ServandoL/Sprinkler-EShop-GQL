@@ -74,7 +74,7 @@ export const Mutation = {
     { dataSources }: any,
     info: any
   ) => {
-    const checkoutClient: MongoServer = dataSources.checkoutApi;
+    const checkoutClient: MongoServer = dataSources.ordersApi;
     const cartClient: MongoServer = dataSources.cartApi;
     const productClient: MongoServer = dataSources.productsApi;
     try {

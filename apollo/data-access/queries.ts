@@ -32,6 +32,29 @@ export const Query = {
       await client.stop();
     }
   },
+
+  orders: async (
+    parent: any,
+    { email }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client: MongoServer = dataSources.ordersApi;
+    try {
+      await client.start();
+      const result = await client.getOrders(email);
+      if (result.length) {
+        return result;
+      } else {
+        return new ApolloError(`You haven't placed any orders yet.`);
+      }
+    } catch (error) {
+      return error;
+    } finally {
+      await client.stop();
+    }
+  },
+
   productById: async (
     parent: any,
     { _id }: any,

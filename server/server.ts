@@ -59,6 +59,18 @@ export class MongoServer extends DataSource {
     }
   }
 
+  async getOrders(email: string) {
+    try {
+      return await this.database.find({ email: email }).toArray();
+    } catch (error) {
+      return new ApolloError(
+        `An error occurred while retrieving your orders. ${JSON.stringify({
+          error: error,
+        })}`
+      );
+    }
+  }
+
   async saveCart(request: SaveCartRequest): Promise<UpdateResult | any> {
     try {
       return await this.database.updateOne(

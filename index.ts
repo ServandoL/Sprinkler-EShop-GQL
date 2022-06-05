@@ -12,7 +12,7 @@ const dataSources = () => ({
   productsApi: new MongoServer(productsCollection),
   usersApi: new MongoServer(usersCollection),
   cartApi: new MongoServer(cartCollection),
-  checkoutApi: new MongoServer(ordersCollection),
+  ordersApi: new MongoServer(ordersCollection),
 });
 
 const port = process.env.port || 4000;

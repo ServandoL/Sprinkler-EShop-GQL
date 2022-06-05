@@ -4,6 +4,8 @@ export const typeDefs = gql`
   type Query {
     cart(user_id: String): getCartResponse
 
+    orders(email: String): [OrderType]
+
     products(
       _id: ID
       productName: String
@@ -65,6 +67,32 @@ export const typeDefs = gql`
       productName: String
       quantity: Int
     ): updateCartQuantityResponse
+  }
+
+  type OrderType {
+    _id: String
+    order: [Cart]
+    shipping: ShippingType
+    payment: PaymentType
+    email: String
+    orderedDate: String
+    total: Float
+    orderId: String
+  }
+
+  type ShippingType {
+    address: String
+    address2: String
+    city: String
+    state: String
+    zipCode: String
+  }
+
+  type PaymentType {
+    cardNumber: String
+    month: String
+    year: String
+    cvv: String
   }
 
   type getCartResponse {
@@ -146,14 +174,14 @@ export const typeDefs = gql`
 
   type Cart {
     _id: ID
-    user_id: String!
-    productName: String!
-    price: Float!
-    category: String!
-    brand: String!
-    stock: Int!
+    user_id: String
+    productName: String
+    price: Float
+    category: String
+    brand: String
+    stock: Int
     imageUrl: String
-    quantity: Int!
+    quantity: Int
   }
 
   input CartInput {
