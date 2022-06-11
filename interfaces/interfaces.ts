@@ -1,20 +1,5 @@
-import { Document, ObjectId } from 'mongodb';
-
-export interface IProduct {
-  _id: String | ObjectId;
-  productName: String;
-  price: Number;
-  category: String;
-  brand: String;
-  stock: Number;
-  imageUrl?: String;
-  isDeleted?: Boolean;
-  deleted_by?: String;
-  deleted_date?: String;
-}
-
 export interface IUser {
-  _id: String | ObjectId;
+  _id: String;
   fname: String;
   lname: String;
   email: String;
@@ -63,23 +48,21 @@ export interface Order {
   orderId: string;
 }
 
-export interface PaginatedResponse {
-  data: Document[];
-  pagination: Pagination;
-}
 export interface Pagination {
-  pageSize: number;
-  pageNumber: number;
-  firstPage: boolean;
-  lastPage: boolean;
-  currentPage: number;
-  totalElements: number;
+  totalDocs: number;
+  limit: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+  page: number;
   totalPages: number;
+  offset: number;
+  prevPage: number;
+  nextPage: number;
+  pagingCounter: number;
 }
-export interface ProductRequest {
-  category: string;
-  page: {
-    pageNumber: number;
-    pageSize: number;
-  };
+
+export interface Page {
+  pageNumber: number;
+  pageSize: number;
+  sort?: string[];
 }

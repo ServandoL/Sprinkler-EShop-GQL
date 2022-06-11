@@ -1,33 +1,39 @@
-import { ApolloServer } from 'apollo-server';
-import { resolvers } from './apollo/data-access/resolvers';
-import { typeDefs } from './apollo/data-access/schema';
-import { MongoServer } from './server/server';
+import { ApolloServer } from "apollo-server";
+import mongoose from "mongoose";
+import { resolvers } from "./apollo/products-data-access/resolvers";
+import { productsTypeDef } from "./apollo/products-data-access/schema";
+import { MongoServer } from "./server/server";
+import * as env from "./config";
+import { ProductDataSource } from "./apollo/products-data-access/datasource";
 
-const productsCollection = process.env.productsCollection;
-const usersCollection = process.env.usersCollection;
-const cartCollection = process.env.cartCollection;
-const ordersCollection = process.env.ordersCollection;
+async function main() {
+  const connectionString = env.connectionString;
+  const port = env.port;
 
-const dataSources = () => ({
-  productsApi: new MongoServer(productsCollection),
-  usersApi: new MongoServer(usersCollection),
-  cartApi: new MongoServer(cartCollection),
-  ordersApi: new MongoServer(ordersCollection),
-});
+  await mongoose.connect(connectionString);
 
-const port = process.env.port || 4000;
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  dataSources,
-  introspection: true,
-});
-
-server
-  .listen({ port: port })
-  .then(({ url }) => {
-    console.log(`Apollo server running on ${url}`);
-  })
-  .catch((error: Error) => {
-    console.log('Sprinkler E-Shop', JSON.stringify({ error: error }));
+  const dataSources = () => ({
+    productsApi: new ProductDataSource(mongoose.connection),
+    usersApi: new MongoServer(mongoose.connection),
+    cartApi: new MongoServer(mongoose.connection),
+    ordersApi: new MongoServer(mongoose.connection),
   });
+
+  const server = new ApolloServer({
+    typeDefs: [productsTypeDef],
+    resolvers,
+    dataSources,
+    introspection: true,
+  });
+
+  server.listen({ port: port }).then(({ url }) => {
+    console.log(`index`, `Apollo server listening on ${url}`);
+  });
+}
+
+main().catch((error) =>
+  console.log(
+    `index`,
+    `An error occurred while creating connections. ${JSON.stringify(error)}`
+  )
+);

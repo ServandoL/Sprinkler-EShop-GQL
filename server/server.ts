@@ -1,45 +1,20 @@
-import { DataSource } from 'apollo-datasource';
-import { ApolloError } from 'apollo-server';
-import {
-  Collection,
-  Document,
-  MongoClient,
-  UpdateResult,
-  WithId,
-} from 'mongodb';
+import { DataSource } from "apollo-datasource";
+import { ApolloError } from "apollo-server";
+import mongoose from "mongoose";
 import {
   ICart,
   Order,
   PaginatedResponse,
   ProductRequest,
   SaveCartRequest,
-} from '../interfaces/interfaces';
+} from "../interfaces/interfaces";
 
 export class MongoServer extends DataSource {
-  uri = process.env.connectionString || '';
-  client = new MongoClient(this.uri, { monitorCommands: true });
-  dbName = process.env.mongoDatabase || '';
-  collection!: string | undefined;
-  database!: Collection<Document>;
+  connection!: mongoose.Connection;
 
-  constructor(collectionName: string | undefined) {
+  constructor(connection: mongoose.Connection) {
     super();
-    this.collection = collectionName;
-  }
-
-  async start() {
-    if (this.collection) {
-      await this.client.connect();
-      this.database = this.client.db(this.dbName).collection(this.collection);
-      console.log(`Connected successfully to MongoDB: ${this.dbName}`);
-      this.client.on('commandStarted', (event) => console.debug(event));
-      this.client.on('commandSucceeded', (event) => console.debug(event));
-      this.client.on('commandFailed', (event) => console.debug(event));
-    }
-  }
-
-  async stop() {
-    await this.client.close();
+    this.connection = connection;
   }
 
   async getProducts(
@@ -165,7 +140,7 @@ export class MongoServer extends DataSource {
         productName: product.productName,
       });
       if (product.quantity > document?.stock) {
-        return 'Error: Quantity cannot be greater than available stock amount.';
+        return "Error: Quantity cannot be greater than available stock amount.";
       } else {
         return await this.database.updateOne(
           {
@@ -191,13 +166,13 @@ export class MongoServer extends DataSource {
   async checkout(order: Order, productClient: MongoServer) {
     try {
       for (const product of order.order) {
-        console.log('product', product);
+        console.log("product", product);
         const found: WithId<Document> | null =
           await productClient.database.findOne({
             productName: product.productName,
           });
         if (found !== null) {
-          console.log('found', found);
+          console.log("found", found);
           await productClient.database.updateOne(
             { _id: found._id },
             {
@@ -264,7 +239,7 @@ export class MongoServer extends DataSource {
         if (!duplicateExists) {
           return await this.database.insertOne(obj);
         }
-        return 'User already exists.';
+        return "User already exists.";
       }
     } catch (err) {
       console.log(`Error occured while inserting: ${err}`);
