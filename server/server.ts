@@ -1,19 +1,17 @@
 import { DataSource } from 'apollo-datasource';
 import { ApolloError } from 'apollo-server';
-import _ from 'lodash';
 import {
   Collection,
   Document,
-  InsertOneResult,
   MongoClient,
-  ObjectId,
   UpdateResult,
   WithId,
 } from 'mongodb';
 import {
   ICart,
-  IProduct,
   Order,
+  PaginatedResponse,
+  ProductRequest,
   SaveCartRequest,
 } from '../interfaces/interfaces';
 
@@ -21,7 +19,7 @@ export class MongoServer extends DataSource {
   uri = process.env.connectionString || '';
   client = new MongoClient(this.uri, { monitorCommands: true });
   dbName = process.env.mongoDatabase || '';
-  collection!: any;
+  collection!: string | undefined;
   database!: Collection<Document>;
 
   constructor(collectionName: string | undefined) {
@@ -30,21 +28,67 @@ export class MongoServer extends DataSource {
   }
 
   async start() {
-    await this.client.connect();
-    this.database = this.client.db(this.dbName).collection(this.collection);
-    console.log(`Connected successfully to MongoDB: ${this.dbName}`);
-    this.client.on('commandStarted', (event) => console.debug(event));
-    this.client.on('commandSucceeded', (event) => console.debug(event));
-    this.client.on('commandFailed', (event) => console.debug(event));
+    if (this.collection) {
+      await this.client.connect();
+      this.database = this.client.db(this.dbName).collection(this.collection);
+      console.log(`Connected successfully to MongoDB: ${this.dbName}`);
+      this.client.on('commandStarted', (event) => console.debug(event));
+      this.client.on('commandSucceeded', (event) => console.debug(event));
+      this.client.on('commandFailed', (event) => console.debug(event));
+    }
   }
 
   async stop() {
     await this.client.close();
   }
 
-  async getAll(args: any) {
-    const data = await this.database.find({}).toArray();
-    return _.filter(data, args);
+  async getProducts(
+    request: ProductRequest
+  ): Promise<PaginatedResponse | ApolloError> {
+    try {
+      const aggregate = [
+        {
+          $match: {
+            category: request.category,
+          },
+        },
+      ];
+      const paginatedResult = await pagination(
+        this.database,
+        request.page.pageNumber,
+        request.page.pageSize,
+        aggregate
+      );
+      return paginatedResult;
+    } catch (error) {
+      return new ApolloError(
+        `An error occurred while retrieving the products. ${JSON.stringify({
+          error: error,
+        })}`
+      );
+    }
+  }
+
+  async getAllProducts(
+    request: ProductRequest
+  ): Promise<PaginatedResponse | ApolloError> {
+    try {
+      const query = {};
+      const paginatedResult = await pagination(
+        this.database,
+        request.page.pageNumber,
+        request.page.pageSize,
+        [],
+        query
+      );
+      return paginatedResult;
+    } catch (error) {
+      return new ApolloError(
+        `An error occurred while retrieving the products. ${JSON.stringify({
+          error: error,
+        })}`
+      );
+    }
   }
 
   async getCart(user_id: string) {
@@ -247,4 +291,47 @@ export class MongoServer extends DataSource {
       );
     }
   }
+}
+
+export async function pagination(
+  collection: Collection,
+  pageNumber: number,
+  pageSize: number,
+  aggregate: any[],
+  query?: any
+) {
+  let count: Document[] = [];
+  let paginatedResponse = undefined;
+  const skips = pageSize * (pageNumber - 1);
+
+  if (query !== undefined) {
+    count = await collection.find(query).toArray();
+    paginatedResponse = await collection
+      .find(query)
+      .skip(skips)
+      .limit(pageSize)
+      .toArray();
+  } else {
+    count = await collection.aggregate(aggregate).toArray();
+    paginatedResponse = await collection
+      .aggregate(aggregate)
+      .skip(skips)
+      .limit(pageSize)
+      .toArray();
+  }
+  const totalElements = count ? count.length : 0;
+  const totalPages = Math.ceil(totalElements / pageSize);
+  const lastPage = pageNumber === totalPages;
+  return {
+    data: [...paginatedResponse],
+    pagination: {
+      pageNumber: pageNumber,
+      pageSize: pageSize,
+      totalElement: totalElements,
+      totalPages: totalPages,
+      lastPage: lastPage,
+      firstPage: pageNumber === 1,
+      currentPage: pageNumber,
+    },
+  } as PaginatedResponse;
 }

@@ -21,11 +21,34 @@ export const Query = {
       await client.stop();
     }
   },
-  products: async (parent: any, args: any, { dataSources }: any, info: any) => {
-    const client = dataSources.productsApi;
+  products: async (
+    parent: any,
+    { productRequest }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client: MongoServer = dataSources.productsApi;
     try {
       await client.start();
-      return await client.getAll(args);
+      const result = await client.getProducts(productRequest);
+      return result;
+    } catch (err) {
+      return err;
+    } finally {
+      await client.stop();
+    }
+  },
+  allProducts: async (
+    parent: any,
+    { productRequest }: any,
+    { dataSources }: any,
+    info: any
+  ) => {
+    const client: MongoServer = dataSources.productsApi;
+    try {
+      await client.start();
+      const result = await client.getAllProducts(productRequest);
+      return result;
     } catch (err) {
       return err;
     } finally {

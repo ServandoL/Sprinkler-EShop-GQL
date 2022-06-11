@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { Document, ObjectId } from 'mongodb';
 
 export interface IProduct {
   _id: String | ObjectId;
@@ -61,4 +61,25 @@ export interface Order {
   orderedDate: Date;
   total: number;
   orderId: string;
+}
+
+export interface PaginatedResponse {
+  data: Document[];
+  pagination: Pagination;
+}
+export interface Pagination {
+  pageSize: number;
+  pageNumber: number;
+  firstPage: boolean;
+  lastPage: boolean;
+  currentPage: number;
+  totalElement: number;
+  totalPages: number;
+}
+export interface ProductRequest {
+  category: string;
+  page: {
+    pageNumber: number;
+    pageSize: number;
+  };
 }
