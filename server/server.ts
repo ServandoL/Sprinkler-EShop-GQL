@@ -237,6 +237,16 @@ export class MongoServer extends DataSource {
     }
   }
 
+  async getUserByEmail(email: string, password: string) {
+    try {
+      return await this.database.findOne({ email: email, password: password });
+    } catch (error) {
+      return new ApolloError(
+        `An error occurred fetching the user. ${JSON.stringify({ error })}`
+      );
+    }
+  }
+
   async getOneById(id: any) {
     try {
       const query = { _id: id };
@@ -327,7 +337,7 @@ export async function pagination(
     pagination: {
       pageNumber: pageNumber,
       pageSize: pageSize,
-      totalElement: totalElements,
+      totalElements: totalElements,
       totalPages: totalPages,
       lastPage: lastPage,
       firstPage: pageNumber === 1,

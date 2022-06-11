@@ -95,10 +95,30 @@ export const Query = {
     }
   },
   users: async (parent: any, args: any, { dataSources }: any, info: any) => {
-    const client = dataSources.usersApi;
+    const client: MongoServer = dataSources.usersApi;
     try {
       await client.start();
-      return await client.getAll(args);
+      const result = await client.getUserByEmail(args.email, args.password);
+      if (result === null) {
+        return {
+          message: 'No user with email or password was found.',
+          success: false,
+          user: null,
+        };
+      }
+      if (result._id) {
+        return {
+          message: 'Successfully retrieved user.',
+          success: true,
+          user: result,
+        };
+      } else {
+        return {
+          message: 'Internal server error.',
+          success: false,
+          user: result,
+        };
+      }
     } catch (err) {
       return err;
     } finally {

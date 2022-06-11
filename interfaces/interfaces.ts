@@ -73,7 +73,7 @@ export interface Pagination {
   firstPage: boolean;
   lastPage: boolean;
   currentPage: number;
-  totalElement: number;
+  totalElements: number;
   totalPages: number;
 }
 export interface ProductRequest {

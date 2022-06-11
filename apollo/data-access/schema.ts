@@ -12,7 +12,7 @@ export const typeDefs = gql`
 
     productById(_id: ID): Product
 
-    users(_id: ID, email: String, isAdmin: Boolean, password: String): [User]
+    users(email: String, password: String): getUserResponse
     userById(_id: ID): User
   }
 
@@ -110,6 +110,12 @@ export const typeDefs = gql`
     createdDate: String
   }
 
+  type getUserResponse {
+    message: String
+    success: Boolean
+    user: User
+  }
+
   type updateCartQuantityResponse {
     message: String
     success: Boolean
@@ -160,7 +166,7 @@ export const typeDefs = gql`
   }
 
   type User {
-    _id: ID!
+    _id: String
     fname: String!
     lname: String!
     email: String!
@@ -249,7 +255,7 @@ export const typeDefs = gql`
     firstPage: Boolean
     lastPage: Boolean
     currentPage: Int
-    totalElement: Int
+    totalElements: Int
     totalPages: Int
   }
 `;
