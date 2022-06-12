@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from 'apollo-server';
 
 export const productsTypeDef = gql`
   type Query {
@@ -7,15 +7,9 @@ export const productsTypeDef = gql`
   }
 
   type Mutation {
-    addProduct(
-      productName: String
-      price: Float
-      category: String
-      brand: String
-      stock: Int
-    ): addProductResponse
+    addProduct(addProductRequest: AddProductRequest): addProductResponse
 
-    deleteProduct(_id: ID): deleteProductResponse
+    deleteProduct(deleteRequest: DeleteRequest): deleteProductResponse
   }
 
   input ProductInput {
@@ -28,6 +22,16 @@ export const productsTypeDef = gql`
     deleted_by: String
     deleted_date: String
     page: Page
+  }
+
+  input DeleteProductItem {
+    _id: String!
+    productName: String
+    price: Float
+    category: String
+    brand: String
+    stock: Int
+    imageUrl: String
   }
 
   type getProductResponse {
@@ -43,11 +47,10 @@ export const productsTypeDef = gql`
   type addProductResponse {
     message: String
     success: Boolean
-    product: Product
   }
 
   type Product {
-    _id: ID!
+    _id: String
     productName: String!
     price: Float!
     category: String!
@@ -59,21 +62,36 @@ export const productsTypeDef = gql`
     deleted_date: String
   }
 
+  input DeleteRequest {
+    product: DeleteProductItem
+    email: String
+  }
+
+  input AddProductRequest {
+    productName: String!
+    price: Float!
+    category: String!
+    brand: String!
+    stock: Int!
+    imageUrl: String
+    addedBy: String
+  }
+
   input Page {
     pageSize: Int
     pageNumber: Int
   }
 
   type Pagination {
-    totalDocs: Int;
-    limit: Int;
-    hasPrevPage: Boolean;
-    hasNextPage: Boolean;
-    page: Int;
-    totalPages: Int;
-    offset: Int;
-    prevPage: Int;
-    nextPage: Int;
-    pagingCounter: Int;
+    totalDocs: Int
+    limit: Int
+    hasPrevPage: Boolean
+    hasNextPage: Boolean
+    page: Int
+    totalPages: Int
+    offset: Int
+    prevPage: Int
+    nextPage: Int
+    pagingCounter: Int
   }
 `;

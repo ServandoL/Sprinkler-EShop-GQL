@@ -1,7 +1,7 @@
-import mongoose, { Document, Schema } from "mongoose";
-import paginate from "mongoose-paginate-v2";
-import { IProduct } from "../../../interfaces/interfaces";
-import * as env from "../../../config";
+import { Schema } from 'mongoose';
+import paginate from 'mongoose-paginate-v2';
+import * as env from '../../../config';
+import { IProduct } from './interfaces';
 const productColn = env.productsCollection;
 
 export const ProductSchema = new Schema<IProduct>(
@@ -16,6 +16,8 @@ export const ProductSchema = new Schema<IProduct>(
     isDeleted: Boolean,
     deleted_by: String,
     deleted_date: String,
+    addedDate: String,
+    addedBy: String,
   },
   {
     collection: productColn,
