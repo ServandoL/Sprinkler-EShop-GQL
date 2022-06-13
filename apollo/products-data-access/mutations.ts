@@ -22,7 +22,6 @@ export const Mutation = {
         addedDate: new Date().toISOString(),
         _id: new mongoose.mongo.ObjectId(),
       });
-      console.log('result', result);
       if (result._id) {
         return {
           message: 'Product added successfully.',
@@ -45,7 +44,6 @@ export const Mutation = {
   ) => {
     try {
       const result = await softDeleteProduct(deleteRequest, ProductModel);
-      console.log(result);
       if (result) {
         if (result.isDeleted) {
           return {

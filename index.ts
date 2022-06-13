@@ -1,7 +1,11 @@
 import { ApolloServer } from 'apollo-server';
 import mongoose from 'mongoose';
+import { CartResolvers } from './apollo/cart-data-access/resolvers';
+import { CartTypeDefs } from './apollo/cart-data-access/schema';
 import { ProductResolvers } from './apollo/products-data-access/resolvers';
-import { productsTypeDef } from './apollo/products-data-access/schema';
+import { ProductsTypeDef } from './apollo/products-data-access/schema';
+import { UserResolvers } from './apollo/users-data-access/resolvers';
+import { UserTypeDefs } from './apollo/users-data-access/schema';
 import * as env from './config';
 
 async function main() {
@@ -12,8 +16,8 @@ async function main() {
   await mongoose.connect(connectionString, { dbName: database });
 
   const server = new ApolloServer({
-    typeDefs: [productsTypeDef],
-    resolvers: [ProductResolvers],
+    typeDefs: [ProductsTypeDef, UserTypeDefs, CartTypeDefs],
+    resolvers: [ProductResolvers, UserResolvers, CartResolvers],
     introspection: true,
   });
 

@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server';
 
-export const productsTypeDef = gql`
+export const ProductsTypeDef = gql`
   type Query {
     products(productRequest: ProductInput): getProductResponse
     allProducts(productRequest: ProductInput): getProductResponse

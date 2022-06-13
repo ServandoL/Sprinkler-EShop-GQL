@@ -119,7 +119,7 @@ export async function addNewProduct(
       ...request,
       addedDate: new Date().toISOString(),
     });
-    console.log('results', result);
+    return result;
   } catch (error) {
     return new ApolloError(
       `An error occurred while creating the new product. ${JSON.stringify(

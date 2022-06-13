@@ -3,7 +3,7 @@ import { getAllProducts, getProducts } from './datasource';
 import { IProduct } from './models/interfaces';
 import * as env from '../../config';
 import { ProductSchema } from './models/products.schema';
-const model: PaginateModel<IProduct> = mongoose.model<
+const ProductModel: PaginateModel<IProduct> = mongoose.model<
   IProduct,
   PaginateModel<IProduct>
 >(env.productsCollection, ProductSchema);
@@ -16,7 +16,7 @@ export const Query = {
     info: any
   ) => {
     try {
-      const result = await getProducts(productRequest, model);
+      const result = await getProducts(productRequest, ProductModel);
       return result;
     } catch (err) {
       return err;
@@ -29,7 +29,7 @@ export const Query = {
     info: any
   ) => {
     try {
-      const result = await getAllProducts(productRequest, model);
+      const result = await getAllProducts(productRequest, ProductModel);
       return result;
     } catch (err) {
       return err;
