@@ -1,19 +1,11 @@
 import { ApolloError } from 'apollo-server';
-import mongoose from 'mongoose';
-import { IUser } from './models/interfaces';
-import { UserSchema } from './models/users.schema';
-import * as env from '../../config';
-import { createUser, updateUser } from './datasource';
+import { createUser, deleteUser, updateUser } from './datasource';
 
-const UserModel: mongoose.Model<IUser> = mongoose.model<IUser>(
-  env.usersCollection,
-  UserSchema
-);
 export const Mutation = {
   addUser: async (parent: any, { request }: any) => {
     try {
       if (request.fname && request.lname && request.email && request.password) {
-        const result = await createUser(request, UserModel);
+        const result = await createUser(request);
         if (result.message !== undefined || result.message !== null) {
           if (result.success) {
             return result;
@@ -32,7 +24,7 @@ export const Mutation = {
   },
   updateUserInformation: async (parent: any, { request }: any) => {
     try {
-      const result = await updateUser(request, UserModel);
+      const result = await updateUser(request);
       if (result) {
         if (result.updated) {
           return {
@@ -44,6 +36,23 @@ export const Mutation = {
             'There was an error while trying to update your account. Please try again.'
           );
         }
+      }
+    } catch (error) {
+      return error;
+    }
+  },
+  deleteUser: async (parent: any, { email }: any) => {
+    try {
+      const result = await deleteUser(email);
+      if (result && result._id) {
+        return {
+          message: 'Successfully deleted your account.',
+          success: true,
+        };
+      } else {
+        return new ApolloError(
+          `There was an issue trying to process your request. Please try agian.`
+        );
       }
     } catch (error) {
       return error;

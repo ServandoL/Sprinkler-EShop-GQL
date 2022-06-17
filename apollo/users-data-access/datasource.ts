@@ -2,15 +2,18 @@ import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
 import mongoose, { FilterQuery, UpdateQuery } from 'mongoose';
 import { IUser, UpdateRequest } from './models/interfaces';
+import * as env from '../../config';
+import { UserSchema } from './models/users.schema';
 
-export async function getUser(
-  email: string,
-  password: string,
-  model: mongoose.Model<IUser>
-) {
+const UserModel: mongoose.Model<IUser> = mongoose.model<IUser>(
+  env.usersCollection,
+  UserSchema
+);
+
+export async function getUser(email: string, password: string) {
   try {
     const query: FilterQuery<IUser> = { email: email, password: password };
-    const [error, data] = await to(model.findOne(query).exec());
+    const [error, data] = await to(UserModel.findOne(query).exec());
     if (error) {
       return new ApolloError(
         `An error occurred while retrieving the products. ${JSON.stringify(
@@ -39,10 +42,10 @@ export async function getUser(
   }
 }
 
-export async function createUser(user: IUser, model: mongoose.Model<IUser>) {
+export async function createUser(user: IUser) {
   try {
     const query: FilterQuery<IUser> = { email: user.email };
-    const exists = await model.findOne(query).exec();
+    const exists = await UserModel.findOne(query).exec();
     if (exists?._id) {
       return new ApolloError(
         `This email is already registered. ${JSON.stringify({
@@ -51,7 +54,7 @@ export async function createUser(user: IUser, model: mongoose.Model<IUser>) {
       );
     } else {
       const [error, data] = await to(
-        model.create({
+        UserModel.create({
           ...user,
           createdDate: new Date().toISOString(),
           _id: new mongoose.mongo.ObjectId(),
@@ -77,10 +80,7 @@ export async function createUser(user: IUser, model: mongoose.Model<IUser>) {
   }
 }
 
-export async function updateUser(
-  request: UpdateRequest,
-  model: mongoose.Model<IUser>
-) {
+export async function updateUser(request: UpdateRequest) {
   try {
     const query: FilterQuery<IUser> = { email: request.email };
     const update: UpdateQuery<IUser> = {
@@ -88,10 +88,32 @@ export async function updateUser(
       updatedDate: new Date().toISOString(),
       updated: true,
     };
-    return model.findOneAndUpdate(query, update, { returnDocument: 'after' });
+    return UserModel.findOneAndUpdate(query, update, {
+      returnDocument: 'after',
+    });
   } catch (error) {
     return new ApolloError(
       `An error occurred while trying to update your account. ${JSON.stringify(
+        error
+      )}`
+    );
+  }
+}
+
+export async function deleteUser(email: string) {
+  try {
+    const query: FilterQuery<IUser> = { email: email };
+    const [error, data] = await to(UserModel.findOneAndRemove(query).exec());
+    if (error) {
+      return new ApolloError(
+        `An error occurred while trying to delete your account. Please try agian.`
+      );
+    } else {
+      return data;
+    }
+  } catch (error) {
+    return new ApolloError(
+      `An error occurred while trying to delete your account. Please try again. ${JSON.stringify(
         error
       )}`
     );

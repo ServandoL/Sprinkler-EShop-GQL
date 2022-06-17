@@ -1,18 +1,9 @@
-import mongoose, { FilterQuery } from 'mongoose';
-import { IUser } from './models/interfaces';
-import * as env from '../../config';
-import { UserSchema } from './models/users.schema';
 import { getUser } from './datasource';
-
-const UserModel: mongoose.Model<IUser> = mongoose.model<IUser>(
-  env.usersCollection,
-  UserSchema
-);
 
 export const Query = {
   getUser: async (parent: any, { email, password }: any) => {
     try {
-      const result = await getUser(email, password, UserModel);
+      const result = await getUser(email, password);
       if (result === null) {
         return {
           message: 'No user with that email or password was found.',
