@@ -1,7 +1,4 @@
-import mongoose from 'mongoose';
-import { SaveCartRequest } from './models/interfaces';
-import * as env from '../../config';
-import { CartSchema } from './models/cart.schema';
+import { ICart } from './models/interfaces';
 import {
   saveCart,
   addToCart,
@@ -9,27 +6,27 @@ import {
   updateCartQuantity,
 } from './datasource';
 import { ApolloError } from 'apollo-server';
-import { IProduct } from '../products-data-access/models/interfaces';
-import { ProductSchema } from '../products-data-access/models/products.schema';
-const CartModel: mongoose.Model<SaveCartRequest> =
-  mongoose.model<SaveCartRequest>(env.cartCollection, CartSchema);
-const ProductModel: mongoose.Model<IProduct> = mongoose.model<IProduct>(
-  env.productsCollection,
-  ProductSchema
-);
 
 export const Mutation = {
-  saveCart: async (parent: any, { request }: any) => {
+  saveCart: async (
+    parent: any,
+    args: {
+      request: {
+        email: string;
+        cart: ICart[];
+      };
+    }
+  ) => {
     try {
-      const result = await saveCart(request, CartModel);
-      if (result._id) {
+      const result = await saveCart(args.request.email, args.request.cart);
+      if (result && result._id) {
         return {
           message: 'Your cart was saved successfully.',
           success: true,
         };
       } else {
         return new ApolloError(
-          `An error occurred while trying to save your cart.`
+          `An error occurred while trying to save your cart. You can only save one cart at a time.`
         );
       }
     } catch (error) {
@@ -45,7 +42,7 @@ export const Mutation = {
             success: false,
           };
         } else {
-          const result = await addToCart(request, CartModel, ProductModel);
+          const result = await addToCart(request);
           if (result) {
             if (result.updated) {
               return {
@@ -72,7 +69,7 @@ export const Mutation = {
   },
   clearCart: async (parent: any, { email }: any) => {
     try {
-      const result = await clearCart(email, CartModel);
+      const result = await clearCart(email);
       if (result) {
         if (result._id) {
           return {
@@ -98,11 +95,7 @@ export const Mutation = {
           success: false,
         };
       } else {
-        const result = await updateCartQuantity(
-          request,
-          CartModel,
-          ProductModel
-        );
+        const result = await updateCartQuantity(request);
         if (result) {
           if (result.updated) {
             return {

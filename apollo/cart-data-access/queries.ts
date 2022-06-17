@@ -1,15 +1,10 @@
-import mongoose from 'mongoose';
-import { ICart, SaveCartRequest } from './models/interfaces';
-import * as env from '../../config';
-import { CartSchema } from './models/cart.schema';
+import { ICart } from './models/interfaces';
 import { getCart } from './datasource';
-const CartModel: mongoose.Model<SaveCartRequest> =
-  mongoose.model<SaveCartRequest>(env.cartCollection, CartSchema);
 
 export const Query = {
   getCart: async (parent: any, { email }: any) => {
     try {
-      const result = await getCart(email, CartModel);
+      const result = await getCart(email);
 
       if (result?.type === 'SaveCartRequest') {
         return {

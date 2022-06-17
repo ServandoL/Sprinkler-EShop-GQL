@@ -3,13 +3,18 @@ import to from 'await-to-js';
 import mongoose, { FilterQuery, UpdateQuery } from 'mongoose';
 import { IProduct } from '../products-data-access/models/interfaces';
 import { ICart, SaveCartRequest } from './models/interfaces';
-
-export async function getCart(
-  email: string,
-  model: mongoose.Model<SaveCartRequest>
-) {
+import * as env from '../../config';
+import { ProductSchema } from '../products-data-access/models/products.schema';
+import { CartSchema } from './models/cart.schema';
+const CartModel: mongoose.Model<SaveCartRequest> =
+  mongoose.model<SaveCartRequest>(env.cartCollection, CartSchema);
+const ProductModel: mongoose.Model<IProduct> = mongoose.model<IProduct>(
+  env.productsCollection,
+  ProductSchema
+);
+export async function getCart(email: string) {
   const query: FilterQuery<SaveCartRequest> = { email: email };
-  const [error, data] = await to(model.find(query).exec());
+  const [error, data] = await to(CartModel.find(query).exec());
   if (error) {
     return new ApolloError(
       `An error occurred while retrieving your cart. ${JSON.stringify(error)}`
@@ -22,17 +27,30 @@ export async function getCart(
   }
 }
 
-export async function saveCart(
-  request: SaveCartRequest,
-  model: mongoose.Model<SaveCartRequest>
-) {
+export async function saveCart(email: string, cart: ICart[]) {
   try {
-    const result = await model.create({
-      ...request,
-      createdDate: new Date().toISOString(),
-      _id: new mongoose.mongo.ObjectId(),
-    });
-    return result;
+    let exists!: boolean;
+    const query: FilterQuery<SaveCartRequest> = { email: email };
+    const [error, data] = await to(CartModel.find(query).exec());
+    if (error) {
+      return new ApolloError(`An error occurred trying to save your cart.`);
+    } else {
+      if (data && data.length) {
+        exists = true;
+      } else {
+        exists = false;
+      }
+    }
+    if (!exists) {
+      const result = await CartModel.create({
+        email: email,
+        cart: [...cart],
+        createdDate: new Date().toISOString(),
+        _id: new mongoose.mongo.ObjectId(),
+      });
+      return result;
+    }
+    return undefined;
   } catch (error) {
     return new ApolloError(
       `An error occurred while trying to save your cart. ${JSON.stringify(
@@ -42,15 +60,12 @@ export async function saveCart(
   }
 }
 
-export async function clearCart(
-  email: string,
-  model: mongoose.Model<SaveCartRequest>
-) {
+export async function clearCart(email: string) {
   try {
     const query: FilterQuery<SaveCartRequest> = {
       email: email,
     };
-    return await model.findOneAndRemove(query, { projection: { _id: 1 } });
+    return await CartModel.findOneAndRemove(query, { projection: { _id: 1 } });
   } catch (error) {
     return new ApolloError(
       `An error ocurred while trying to delete your cart. Pleast try again. ${JSON.stringify(
@@ -60,11 +75,7 @@ export async function clearCart(
   }
 }
 
-export async function updateCartQuantity(
-  request: ICart,
-  CartModel: mongoose.Model<SaveCartRequest>,
-  ProductModel: mongoose.Model<IProduct>
-) {
+export async function updateCartQuantity(request: ICart) {
   const query: FilterQuery<SaveCartRequest> = { email: request.email };
   const [error, data] = await to(CartModel.find(query).exec());
   if (error) {
@@ -106,11 +117,7 @@ export async function updateCartQuantity(
   return updatedResult;
 }
 
-export async function addToCart(
-  request: ICart,
-  CartModel: mongoose.Model<SaveCartRequest>,
-  ProductModel: mongoose.Model<IProduct>
-) {
+export async function addToCart(request: ICart) {
   try {
     const query: FilterQuery<SaveCartRequest> = { email: request.email };
     const [error, data] = await to(CartModel.find(query).exec());
@@ -124,7 +131,7 @@ export async function addToCart(
       const cart = data ? [...data[0].cart] : [];
       const exists: any = cart.filter((product) => product._id === request._id);
       if (exists.length) {
-        return await updateCartQuantity(request, CartModel, ProductModel);
+        return await updateCartQuantity(request);
       } else {
         const updatedCart = [...cart];
         updatedCart.push(request);
