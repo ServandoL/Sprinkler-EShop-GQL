@@ -9,7 +9,7 @@ export const CartTypeDefs = gql`
     saveCart(request: SaveCartRequest): genericResponse
     addToCart(request: AddToCartInput): genericResponse
     clearCart(email: String): genericResponse
-    updateCart(request: UpdateCartQuantity): genericResponse
+    updateCart(request: CartInput): genericResponse
   }
 
   input SaveCartRequest {
@@ -19,12 +19,13 @@ export const CartTypeDefs = gql`
 
   input UpdateCartQuantity {
     email: String
-    productName: String
+    _id: String
     quantity: Int
   }
 
   input AddToCartInput {
     _id: String
+    email: String
     quantity: Int
     productName: String
     price: Float

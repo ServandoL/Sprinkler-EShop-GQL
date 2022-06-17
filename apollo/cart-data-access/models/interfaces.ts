@@ -17,3 +17,9 @@ export interface SaveCartRequest {
   createdDate?: string;
   updated?: boolean;
 }
+
+export interface UpdateQuantityRequest {
+  _id: string;
+  email: string;
+  quantity: number;
+}
