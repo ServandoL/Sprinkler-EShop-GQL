@@ -2,6 +2,8 @@ import { ApolloServer } from 'apollo-server';
 import mongoose from 'mongoose';
 import { CartResolvers } from './apollo/cart-data-access/resolvers';
 import { CartTypeDefs } from './apollo/cart-data-access/schema';
+import { OrderResolvers } from './apollo/orders-data-access/resolvers';
+import { OrderTypeDefs } from './apollo/orders-data-access/schema';
 import { ProductResolvers } from './apollo/products-data-access/resolvers';
 import { ProductsTypeDef } from './apollo/products-data-access/schema';
 import { UserResolvers } from './apollo/users-data-access/resolvers';
@@ -16,8 +18,8 @@ async function main() {
   await mongoose.connect(connectionString, { dbName: database });
 
   const server = new ApolloServer({
-    typeDefs: [ProductsTypeDef, UserTypeDefs, CartTypeDefs],
-    resolvers: [ProductResolvers, UserResolvers, CartResolvers],
+    typeDefs: [ProductsTypeDef, UserTypeDefs, CartTypeDefs, OrderTypeDefs],
+    resolvers: [ProductResolvers, UserResolvers, CartResolvers, OrderResolvers],
     introspection: true,
   });
 
@@ -26,12 +28,14 @@ async function main() {
   });
 }
 
-main().catch((error) =>
+main().catch((error) => {
   console.log(
     `index:`,
-    `An error occurred while creating connections. ${JSON.stringify(error)}`
-  )
-);
+    `An error occurred while creating connections. ${JSON.stringify({
+      ...error,
+    })}`
+  );
+});
 
 process.on('SIGINT', gracefulDisconnect).on('SIGTERM', gracefulDisconnect);
 

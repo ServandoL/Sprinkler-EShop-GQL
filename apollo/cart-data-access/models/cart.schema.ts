@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { ICart, SaveCartRequest } from './interfaces';
+import { SaveCartRequest } from './interfaces';
 import * as env from '../../../config';
 import paginate from 'mongoose-paginate-v2';
 

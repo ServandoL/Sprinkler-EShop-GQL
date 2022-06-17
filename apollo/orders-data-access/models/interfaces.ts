@@ -1,11 +1,10 @@
-import { ICart } from '../../cart-data-access/models/interfaces';
-
 export interface Order {
-  order: ICart[];
+  _id: string;
+  order: CartItem[];
   shipping: Shipping;
   payment: CreditCard;
   email: string;
-  orderedDate: Date;
+  orderedDate: string;
   total: number;
   orderId: string;
 }
@@ -23,4 +22,15 @@ export interface CreditCard {
   month: string;
   year: string;
   cvv: string;
+}
+
+export interface CartItem {
+  _id: string;
+  productName: string;
+  price: number;
+  category: string;
+  brand: string;
+  stock: number;
+  imageUrl: string;
+  quantity: number;
 }

@@ -1,12 +1,8 @@
 import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
-import mongoose, { Document, FilterQuery, UpdateQuery } from 'mongoose';
+import mongoose, { FilterQuery, UpdateQuery } from 'mongoose';
 import { IProduct } from '../products-data-access/models/interfaces';
-import {
-  ICart,
-  SaveCartRequest,
-  UpdateQuantityRequest,
-} from './models/interfaces';
+import { ICart, SaveCartRequest } from './models/interfaces';
 
 export async function getCart(
   email: string,
