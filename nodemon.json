@@ -6,6 +6,7 @@
     "productsCollection": "products",
     "usersCollection": "users",
     "cartCollection": "cart",
-    "ordersCollection": "orders"
+    "ordersCollection": "orders",
+    "port": "4000"
   }
 }
