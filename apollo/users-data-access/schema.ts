@@ -38,7 +38,7 @@ export const UserTypeDefs = gql`
   }
 
   type User {
-    _id: String
+    _id: ID
     fname: String
     lname: String
     email: String

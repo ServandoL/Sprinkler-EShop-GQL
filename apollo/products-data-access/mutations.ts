@@ -43,7 +43,7 @@ export const Mutation = {
     info: any
   ) => {
     try {
-      const result = await softDeleteProduct(deleteRequest, ProductModel);
+      const result = await softDeleteProduct(deleteRequest);
       if (result) {
         if (result.isDeleted) {
           return {

@@ -19,12 +19,12 @@ export const CartTypeDefs = gql`
 
   input UpdateCartQuantity {
     email: String
-    _id: String
+    _id: ID
     quantity: Int
   }
 
   input AddToCartInput {
-    _id: String
+    _id: ID
     email: String
     quantity: Int
     productName: String
@@ -36,7 +36,7 @@ export const CartTypeDefs = gql`
   }
 
   input CartInput {
-    _id: String
+    _id: ID
     email: String
     productName: String
     price: Float
@@ -58,7 +58,7 @@ export const CartTypeDefs = gql`
   }
 
   type Cart {
-    _id: String
+    _id: ID
     productName: String
     price: Float
     category: String

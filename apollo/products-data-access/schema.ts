@@ -25,7 +25,7 @@ export const ProductsTypeDef = gql`
   }
 
   input DeleteProductItem {
-    _id: String!
+    _id: ID!
     productName: String
     price: Float
     category: String
@@ -50,7 +50,7 @@ export const ProductsTypeDef = gql`
   }
 
   type Product {
-    _id: String
+    _id: ID
     productName: String!
     price: Float!
     category: String!

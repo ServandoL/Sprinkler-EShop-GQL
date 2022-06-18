@@ -17,19 +17,23 @@ import {
   ProductRequest,
   ProductResponse,
 } from './models/interfaces';
-
+import * as env from '../../config';
+import { ProductSchema } from './models/products.schema';
+const ProductModel = mongoose.model<IProduct, PaginateModel<IProduct>>(
+  env.productsCollection,
+  ProductSchema
+);
 export async function getProducts(
-  request: ProductRequest,
-  model: PaginateModel<IProduct>
+  request: ProductRequest
 ): Promise<ProductResponse | ApolloError> {
   try {
     const pageOptions: PaginateOptions = {
       page: request.page.pageNumber,
       limit: request.page.pageSize,
     };
-    const [error, data] = await to(
-      model.paginate({ category: request.category }, pageOptions)
-    );
+    const query: FilterQuery<ProductResponse> =
+      request.category !== undefined ? { category: request.category } : {};
+    const [error, data] = await to(ProductModel.paginate(query, pageOptions));
 
     if (error) {
       return new ApolloError(
@@ -54,8 +58,7 @@ export async function getProducts(
 }
 
 export async function getAllProducts(
-  request: ProductRequest,
-  model: PaginateModel<IProduct>
+  request: ProductRequest
 ): Promise<ProductResponse | ApolloError> {
   try {
     console.log(request);
@@ -63,7 +66,7 @@ export async function getAllProducts(
       page: request.page.pageNumber,
       limit: request.page.pageSize,
     };
-    const [error, data] = await to(model.paginate({}, pageOptions));
+    const [error, data] = await to(ProductModel.paginate({}, pageOptions));
     if (error) {
       return new ApolloError(
         `An error occurred while retrieving the products. ${JSON.stringify(
@@ -87,8 +90,7 @@ export async function getAllProducts(
 }
 
 export async function softDeleteProduct(
-  request: DeleteRequest,
-  model: mongoose.Model<IProduct>
+  request: DeleteRequest
 ): Promise<IProduct | ApolloError | null> {
   try {
     const filter: FilterQuery<IProduct> = { _id: request.product._id };
@@ -97,7 +99,7 @@ export async function softDeleteProduct(
       deleted_by: request.email,
       deleted_date: new Date().toISOString(),
     };
-    const result = model.findOneAndUpdate(filter, update, {
+    const result = ProductModel.findOneAndUpdate(filter, update, {
       returnDocument: 'after',
     });
     return result;
@@ -110,12 +112,9 @@ export async function softDeleteProduct(
   }
 }
 
-export async function addNewProduct(
-  request: AddProductRequest,
-  model: mongoose.Model<IProduct>
-) {
+export async function addNewProduct(request: AddProductRequest) {
   try {
-    const result = await model.create({
+    const result = await ProductModel.create({
       ...request,
       addedDate: new Date().toISOString(),
     });

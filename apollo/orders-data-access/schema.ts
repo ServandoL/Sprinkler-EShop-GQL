@@ -2,17 +2,21 @@ import { gql } from 'apollo-server';
 
 export const OrderTypeDefs = gql`
   type Query {
-    orders(email: String): getOrderResponse
+    orders(orderHistoryRequest: OrderHistoryRequest): getOrderResponse
   }
 
   type Mutation {
     createOrder(request: OrderInput): genericResponse
   }
 
+  input OrderHistoryRequest {
+    email: String
+    page: Page
+  }
+
   type getOrderResponse {
-    orders: [OrderType]
-    message: String
-    success: Boolean
+    data: [OrderType]
+    pagination: Pagination
   }
 
   type genericResponse {
@@ -55,7 +59,7 @@ export const OrderTypeDefs = gql`
   }
 
   type OrderType {
-    _id: String
+    _id: ID
     order: [Cart]
     shipping: ShippingType
     payment: PaymentType
@@ -81,7 +85,7 @@ export const OrderTypeDefs = gql`
   }
 
   type Cart {
-    _id: String
+    _id: ID
     email: String
     productName: String
     price: Float
@@ -90,5 +94,23 @@ export const OrderTypeDefs = gql`
     stock: Int
     imageUrl: String
     quantity: Int
+  }
+
+  input Page {
+    pageSize: Int
+    pageNumber: Int
+  }
+
+  type Pagination {
+    totalDocs: Int
+    limit: Int
+    hasPrevPage: Boolean
+    hasNextPage: Boolean
+    page: Int
+    totalPages: Int
+    offset: Int
+    prevPage: Int
+    nextPage: Int
+    pagingCounter: Int
   }
 `;

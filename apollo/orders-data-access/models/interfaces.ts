@@ -1,3 +1,5 @@
+import { Pagination } from '../../../interfaces/interfaces';
+
 export interface Order {
   _id: string;
   order: CartItem[];
@@ -33,4 +35,17 @@ export interface CartItem {
   stock: number;
   imageUrl: string;
   quantity: number;
+}
+
+export interface OrderHistoryRequest {
+  email: string;
+  page: {
+    pageSize: number;
+    pageNumber: number;
+  };
+}
+
+export interface OrderHistoryResponse {
+  data: Order[];
+  pagination: Pagination;
 }

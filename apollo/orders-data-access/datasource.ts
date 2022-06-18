@@ -1,12 +1,22 @@
 import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
-import mongoose, { FilterQuery, UpdateQuery } from 'mongoose';
-import { Order } from './models/interfaces';
+import mongoose, {
+  FilterQuery,
+  PaginateModel,
+  PaginateOptions,
+  PaginateResult,
+  UpdateQuery,
+} from 'mongoose';
+import {
+  Order,
+  OrderHistoryRequest,
+  OrderHistoryResponse,
+} from './models/interfaces';
 import * as env from '../../config';
 import { OrderSchema } from './models/orders.schema';
 import { IProduct } from '../products-data-access/models/interfaces';
 import { ProductSchema } from '../products-data-access/models/products.schema';
-const OrderModel: mongoose.Model<Order> = mongoose.model<Order>(
+const OrderModel = mongoose.model<Order, PaginateModel<Order>>(
   env.ordersCollection,
   OrderSchema
 );
@@ -15,9 +25,13 @@ const ProductModel: mongoose.Model<IProduct> = mongoose.model<IProduct>(
   ProductSchema
 );
 
-export async function getOrders(email: string) {
-  const query: FilterQuery<Order> = { email: email };
-  const [error, data] = await to(OrderModel.find(query).exec());
+export async function getOrders(request: OrderHistoryRequest) {
+  const query: FilterQuery<Order> = { email: request.email };
+  const pageOptions: PaginateOptions = {
+    page: request.page.pageNumber,
+    limit: request.page.pageSize,
+  };
+  const [error, data] = await to(OrderModel.paginate(query, pageOptions));
   if (error) {
     return new ApolloError(
       `An error occurred while retrieving your orders. Please try again later. ${JSON.stringify(
@@ -25,7 +39,11 @@ export async function getOrders(email: string) {
       )}`
     );
   } else {
-    return data;
+    const { docs, ...pagination } = data as PaginateResult<Order>;
+    return {
+      data: [...docs],
+      pagination: { ...pagination },
+    } as unknown as OrderHistoryResponse;
   }
 }
 
