@@ -10,6 +10,23 @@ export const ProductsTypeDef = gql`
     addProduct(addProductRequest: AddProductRequest): addProductResponse
 
     deleteProduct(deleteRequest: DeleteRequest): deleteProductResponse
+
+    updateProduct(updateRequest: UpdateProductRequest): genericResponse
+  }
+
+  input UpdateProductRequest {
+    productId: ID
+    modifiedBy: String
+    modifiedDate: String
+    productName: String
+    price: Float
+    stock: Int
+    imageUrl: String
+  }
+
+  type genericResponse {
+    message: String
+    success: Boolean
   }
 
   input ProductInput {

@@ -1,9 +1,9 @@
 import { ApolloError } from 'apollo-server';
 import mongoose, { ObjectId, SaveOptions } from 'mongoose';
-import { IProduct } from './models/interfaces';
+import { IProduct, UpdateProductRequest } from './models/interfaces';
 import { ProductSchema } from './models/products.schema';
 import * as env from '../../config';
-import { addNewProduct, softDeleteProduct } from './datasource';
+import { addNewProduct, softDeleteProduct, updateProduct } from './datasource';
 const ProductModel: mongoose.Model<IProduct> = mongoose.model<IProduct>(
   env.productsCollection,
   ProductSchema
@@ -62,7 +62,29 @@ export const Mutation = {
         };
       }
     } catch (err) {
-      return new ApolloError(JSON.stringify(err));
+      return err;
+    }
+  },
+  updateProduct: async (
+    parent: any,
+    args: {
+      updateRequest: UpdateProductRequest;
+    }
+  ) => {
+    try {
+      const result = await updateProduct(args.updateRequest);
+      if (result && result._id) {
+        return {
+          message: 'Product updated successfully.',
+          success: true,
+        };
+      } else {
+        return new ApolloError(
+          `The product coult not be updated. Please try again.`
+        );
+      }
+    } catch (error) {
+      return error;
     }
   },
 };

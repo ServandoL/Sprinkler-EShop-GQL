@@ -18,6 +18,18 @@ export const ProductSchema = new Schema<IProduct>(
     deleted_date: String,
     addedDate: String,
     addedBy: String,
+    lastModifiedDate: String,
+    modified: [
+      {
+        productId: String,
+        modifiedBy: String,
+        modifiedDate: String,
+        productName: String,
+        price: Number,
+        stock: Number,
+        imageUrl: String,
+      },
+    ],
   },
   {
     collection: productColn,

@@ -1,8 +1,4 @@
-import mongoose, { PaginateModel } from 'mongoose';
 import { getAllProducts, getProducts } from './datasource';
-import { IProduct } from './models/interfaces';
-import * as env from '../../config';
-import { ProductSchema } from './models/products.schema';
 
 export const Query = {
   products: async (

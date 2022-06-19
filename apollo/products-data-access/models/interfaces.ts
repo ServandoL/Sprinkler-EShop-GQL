@@ -42,4 +42,16 @@ export interface IProduct {
   deleted_date?: string;
   addedDate?: string;
   addedBy?: string;
+  lastModifiedDate?: string;
+  modified?: UpdateProductRequest[];
+}
+
+export interface UpdateProductRequest {
+  productId: string;
+  modifiedBy: string;
+  modifiedDate: string;
+  productName: string;
+  price: number;
+  stock: number;
+  imageUrl: string;
 }

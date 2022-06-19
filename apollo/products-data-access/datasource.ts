@@ -16,6 +16,7 @@ import {
   IProduct,
   ProductRequest,
   ProductResponse,
+  UpdateProductRequest,
 } from './models/interfaces';
 import * as env from '../../config';
 import { ProductSchema } from './models/products.schema';
@@ -122,6 +123,39 @@ export async function addNewProduct(request: AddProductRequest) {
   } catch (error) {
     return new ApolloError(
       `An error occurred while creating the new product. ${JSON.stringify(
+        error
+      )}`
+    );
+  }
+}
+
+export async function updateProduct(request: UpdateProductRequest) {
+  try {
+    const filter: FilterQuery<IProduct> = { _id: request.productId };
+    const [error, data] = await to(ProductModel.findOne(filter).exec());
+    if (error) {
+      return new ApolloError(
+        `An error occurred while trying to update this product. ${JSON.stringify(
+          error
+        )}`
+      );
+    } else {
+      const { modified, ...product } = data as unknown as IProduct;
+      if (modified) {
+        return await ProductModel.findOneAndUpdate(
+          filter,
+          {
+            ...request,
+            lastModifiedDate: request.modifiedDate,
+            modified: [...modified, request],
+          },
+          { returnDocument: 'after' }
+        );
+      }
+    }
+  } catch (error) {
+    return new ApolloError(
+      `An error occurred while trying to update this product. ${JSON.stringify(
         error
       )}`
     );
