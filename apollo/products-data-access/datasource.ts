@@ -4,15 +4,13 @@ import mongoose, {
   PaginateModel,
   PaginateOptions,
   PaginateResult,
-  Query,
   UpdateQuery,
-  UpdateWriteOpResult,
 } from 'mongoose';
 import to from 'await-to-js';
 import {
   AddProductRequest,
-  DeletedResponse,
   DeleteRequest,
+  FilterResponse,
   IProduct,
   ProductRequest,
   ProductResponse,
@@ -24,6 +22,55 @@ const ProductModel = mongoose.model<IProduct, PaginateModel<IProduct>>(
   env.productsCollection,
   ProductSchema
 );
+
+export async function getProductFilters(request: string[]) {
+  try {
+    let response: FilterResponse = {
+      brands: [],
+      categories: [],
+      success: false,
+    };
+    const [error, data] = await to(ProductModel.find({}).exec());
+    if (error) {
+      return new ApolloError(
+        `An error occurred while retrieving the products. ${JSON.stringify(
+          error
+        )}`
+      );
+    } else {
+      if (data) {
+        for (const filter of request) {
+          for (const product of data) {
+            if (
+              filter === 'brand' &&
+              !response.brands.includes(product.brand)
+            ) {
+              response.brands.push(product.brand);
+            }
+            if (
+              filter === 'category' &&
+              !response.categories.includes(product.category)
+            ) {
+              response.categories.push(product.category);
+            }
+          }
+        }
+        return {
+          ...response,
+          success: true,
+        } as FilterResponse;
+      }
+      return response;
+    }
+  } catch (error) {
+    return new ApolloError(
+      `An error occurred while retrieving the products. ${JSON.stringify(
+        error
+      )}`
+    );
+  }
+}
+
 export async function getProducts(
   request: ProductRequest
 ): Promise<ProductResponse | ApolloError> {
@@ -107,22 +154,6 @@ export async function softDeleteProduct(
   } catch (error) {
     return new ApolloError(
       `An error occurred while retrieving the products. ${JSON.stringify(
-        error
-      )}`
-    );
-  }
-}
-
-export async function addNewProduct(request: AddProductRequest) {
-  try {
-    const result = await ProductModel.create({
-      ...request,
-      addedDate: new Date().toISOString(),
-    });
-    return result;
-  } catch (error) {
-    return new ApolloError(
-      `An error occurred while creating the new product. ${JSON.stringify(
         error
       )}`
     );

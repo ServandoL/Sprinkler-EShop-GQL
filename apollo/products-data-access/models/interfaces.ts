@@ -27,7 +27,7 @@ export interface AddProductRequest {
   brand: string;
   stock: number;
   imageUrl: string;
-  addedBy: string;
+  createdBy: string;
 }
 export interface IProduct {
   _id: string;
@@ -41,7 +41,8 @@ export interface IProduct {
   deleted_by?: string;
   deleted_date?: string;
   addedDate?: string;
-  addedBy?: string;
+  createdBy?: string;
+  createdDate?: string;
   lastModifiedDate?: string;
   modified?: UpdateProductRequest[];
 }
@@ -54,4 +55,10 @@ export interface UpdateProductRequest {
   price: number;
   stock: number;
   imageUrl: string;
+}
+
+export interface FilterResponse {
+  brands: string[];
+  categories: string[];
+  success: boolean;
 }

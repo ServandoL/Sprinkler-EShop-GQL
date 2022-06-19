@@ -17,8 +17,9 @@ export const ProductSchema = new Schema<IProduct>(
     deleted_by: String,
     deleted_date: String,
     addedDate: String,
-    addedBy: String,
+    createdBy: String,
     lastModifiedDate: String,
+    createdDate: String,
     modified: [
       {
         productId: String,

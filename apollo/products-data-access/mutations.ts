@@ -1,9 +1,13 @@
 import { ApolloError } from 'apollo-server';
 import mongoose, { ObjectId, SaveOptions } from 'mongoose';
-import { IProduct, UpdateProductRequest } from './models/interfaces';
+import {
+  AddProductRequest,
+  IProduct,
+  UpdateProductRequest,
+} from './models/interfaces';
 import { ProductSchema } from './models/products.schema';
 import * as env from '../../config';
-import { addNewProduct, softDeleteProduct, updateProduct } from './datasource';
+import { softDeleteProduct, updateProduct } from './datasource';
 const ProductModel: mongoose.Model<IProduct> = mongoose.model<IProduct>(
   env.productsCollection,
   ProductSchema
@@ -12,14 +16,14 @@ const ProductModel: mongoose.Model<IProduct> = mongoose.model<IProduct>(
 export const Mutation = {
   addProduct: async (
     parent: any,
-    { addProductRequest }: any,
+    args: { addProductRequest: AddProductRequest },
     { dataSources }: any,
     info: any
   ) => {
     try {
       const result = await ProductModel.create({
-        ...addProductRequest,
-        addedDate: new Date().toISOString(),
+        ...args.addProductRequest,
+        createdDate: new Date().toISOString(),
         _id: new mongoose.mongo.ObjectId(),
       });
       if (result._id) {

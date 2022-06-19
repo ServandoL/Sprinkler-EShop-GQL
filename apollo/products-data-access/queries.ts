@@ -1,4 +1,5 @@
-import { getAllProducts, getProducts } from './datasource';
+import { getAllProducts, getProductFilters, getProducts } from './datasource';
+import { FilterResponse } from './models/interfaces';
 
 export const Query = {
   products: async (
@@ -25,6 +26,21 @@ export const Query = {
       return result;
     } catch (err) {
       return err;
+    }
+  },
+  getFilters: async (
+    parent: any,
+    args: {
+      filterRequest: {
+        filters: string[];
+      };
+    }
+  ) => {
+    try {
+      const result = await getProductFilters(args.filterRequest.filters);
+      return result;
+    } catch (error) {
+      return error;
     }
   },
 };

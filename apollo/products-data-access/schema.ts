@@ -4,6 +4,7 @@ export const ProductsTypeDef = gql`
   type Query {
     products(productRequest: ProductInput): getProductResponse
     allProducts(productRequest: ProductInput): getProductResponse
+    getFilters(filterRequest: FilterInput): getFilterResponse
   }
 
   type Mutation {
@@ -12,6 +13,16 @@ export const ProductsTypeDef = gql`
     deleteProduct(deleteRequest: DeleteRequest): deleteProductResponse
 
     updateProduct(updateRequest: UpdateProductRequest): genericResponse
+  }
+
+  input FilterInput {
+    filters: [String]
+  }
+
+  type getFilterResponse {
+    brands: [String]
+    categories: [String]
+    success: Boolean
   }
 
   input UpdateProductRequest {
@@ -91,7 +102,7 @@ export const ProductsTypeDef = gql`
     brand: String!
     stock: Int!
     imageUrl: String
-    addedBy: String
+    createdBy: String!
   }
 
   input Page {
