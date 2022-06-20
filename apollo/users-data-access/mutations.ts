@@ -1,5 +1,5 @@
-import { ApolloError } from 'apollo-server';
-import { createUser, deleteUser, updateUser } from './datasource';
+import { ApolloError } from "apollo-server";
+import { createUser, deleteUser, updateUser } from "./datasource";
 
 export const Mutation = {
   addUser: async (parent: any, { request }: any) => {
@@ -28,12 +28,12 @@ export const Mutation = {
       if (result) {
         if (result.updated) {
           return {
-            message: 'Your account was updated successfully.',
+            message: "Your account was updated successfully.",
             success: true,
           };
         } else {
           return new ApolloError(
-            'There was an error while trying to update your account. Please try again.'
+            "There was an error while trying to update your account. Please try again."
           );
         }
       }
@@ -41,12 +41,13 @@ export const Mutation = {
       return error;
     }
   },
-  deleteUser: async (parent: any, { email }: any) => {
+  deleteUser: async (parent: any, { _id }: any) => {
     try {
-      const result = await deleteUser(email);
+      console.log("deleteUser.mutation", _id);
+      const result = await deleteUser(_id);
       if (result && result._id) {
         return {
-          message: 'Successfully deleted your account.',
+          message: "Successfully deleted your account.",
           success: true,
         };
       } else {

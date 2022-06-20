@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server';
+import { gql } from "apollo-server";
 
 export const UserTypeDefs = gql`
   type Query {
@@ -7,7 +7,7 @@ export const UserTypeDefs = gql`
 
   type Mutation {
     addUser(request: AddUserInput): genericResponse
-    deleteUser(email: String): genericResponse
+    deleteUser(_id: String): genericResponse
     updateUserInformation(request: UpdateUserInput): genericResponse
   }
 

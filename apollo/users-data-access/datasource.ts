@@ -1,9 +1,9 @@
-import { ApolloError } from 'apollo-server';
-import to from 'await-to-js';
-import mongoose, { FilterQuery, UpdateQuery } from 'mongoose';
-import { IUser, UpdateRequest } from './models/interfaces';
-import * as env from '../../config';
-import { UserSchema } from './models/users.schema';
+import { ApolloError } from "apollo-server";
+import to from "await-to-js";
+import mongoose, { FilterQuery, UpdateQuery } from "mongoose";
+import { IUser, UpdateRequest } from "./models/interfaces";
+import * as env from "../../config";
+import { UserSchema } from "./models/users.schema";
 
 const UserModel: mongoose.Model<IUser> = mongoose.model<IUser>(
   env.usersCollection,
@@ -49,7 +49,7 @@ export async function createUser(user: IUser) {
     if (exists?._id) {
       return new ApolloError(
         `This email is already registered. ${JSON.stringify({
-          error: 'User already exists.',
+          error: "User already exists.",
         })}`
       );
     } else {
@@ -68,7 +68,7 @@ export async function createUser(user: IUser) {
         );
       } else {
         return {
-          message: 'Successfully created your account. You may now log in.',
+          message: "Successfully created your account. You may now log in.",
           success: true,
         };
       }
@@ -89,7 +89,7 @@ export async function updateUser(request: UpdateRequest) {
       updated: true,
     };
     return UserModel.findOneAndUpdate(query, update, {
-      returnDocument: 'after',
+      returnDocument: "after",
     });
   } catch (error) {
     return new ApolloError(
@@ -100,10 +100,11 @@ export async function updateUser(request: UpdateRequest) {
   }
 }
 
-export async function deleteUser(email: string) {
+export async function deleteUser(userId: string): Promise<any> {
   try {
-    const query: FilterQuery<IUser> = { email: email };
-    const [error, data] = await to(UserModel.findOneAndRemove(query).exec());
+    const query: FilterQuery<IUser> = { _id: userId };
+    console.log("deleteUser.query", query);
+    const [error, data] = await to(UserModel.deleteOne(query).exec());
     if (error) {
       return new ApolloError(
         `An error occurred while trying to delete your account. Please try agian.`
