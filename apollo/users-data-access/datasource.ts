@@ -82,15 +82,39 @@ export async function createUser(user: IUser) {
 
 export async function updateUser(request: UpdateRequest) {
   try {
-    const query: FilterQuery<IUser> = { email: request.email };
-    const update: UpdateQuery<IUser> = {
-      ...request,
-      updatedDate: new Date().toISOString(),
-      updated: true,
-    };
-    return UserModel.findOneAndUpdate(query, update, {
-      returnDocument: 'after',
-    });
+    const query: FilterQuery<IUser> = { _id: request._id };
+    const result = await UserModel.findById(request._id).exec();
+    const user = result?.toObject() as IUser;
+    if (user && user._id) {
+      if (request.newPassword) {
+        if (request.newPassword === user.password) {
+          return new ApolloError(
+            `ERROR: Your new password can't be the same as your current password.`
+          );
+        } else {
+          user.password = request.newPassword;
+        }
+      }
+      if (request.email) {
+        if (request.email === user.email) {
+          return new ApolloError(
+            `ERROR: Your new email can't be the same as your current email.`
+          );
+        } else {
+          user.email = request.email;
+        }
+      }
+      const update: UpdateQuery<IUser> = {
+        ...user,
+        updatedDate: new Date().toISOString(),
+        updated: true,
+      };
+      return await UserModel.findOneAndUpdate(query, update, {
+        returnDocument: 'after',
+      }).exec();
+    } else {
+      return new ApolloError(`User not found.`);
+    }
   } catch (error) {
     return new ApolloError(
       `An error occurred while trying to update your account. ${JSON.stringify(

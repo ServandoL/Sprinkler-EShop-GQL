@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon index.ts",
-    "build": "npx tsc && cp package.json ./dist/ && cp -r ./node_modules ./dist/"
+    "build": "npx tsc"
   },
   "repository": {
     "type": "git",

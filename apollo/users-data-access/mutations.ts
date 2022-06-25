@@ -1,5 +1,6 @@
 import { ApolloError } from 'apollo-server';
 import { createUser, deleteUser, updateUser } from './datasource';
+import { UpdateRequest } from './models/interfaces';
 
 export const Mutation = {
   addUser: async (parent: any, { request }: any) => {
@@ -22,9 +23,12 @@ export const Mutation = {
       return error;
     }
   },
-  updateUserInformation: async (parent: any, { request }: any) => {
+  updateUserInformation: async (
+    parent: any,
+    args: { request: UpdateRequest }
+  ) => {
     try {
-      const result = await updateUser(request);
+      const result = await updateUser(args.request);
       if (result) {
         if (result.updated) {
           return {
@@ -32,9 +36,11 @@ export const Mutation = {
             success: true,
           };
         } else {
-          return new ApolloError(
-            'There was an error while trying to update your account. Please try again.'
-          );
+          const error = result as ApolloError;
+          return {
+            message: error.message,
+            success: false,
+          };
         }
       }
     } catch (error) {

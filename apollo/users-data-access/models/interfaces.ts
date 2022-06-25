@@ -3,7 +3,7 @@ export interface IUser {
   fname: string;
   lname: string;
   email: string;
-  password: boolean;
+  password: string;
   isAdmin: boolean;
   createdDate?: string;
   updatedDate?: string;
@@ -11,8 +11,7 @@ export interface IUser {
 }
 
 export interface UpdateRequest {
-  email?: String;
-  fname?: String;
-  lname?: String;
-  password?: String;
+  _id: string;
+  email?: string;
+  newPassword?: string;
 }

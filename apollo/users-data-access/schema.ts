@@ -1,4 +1,4 @@
-import { gql } from "apollo-server";
+import { gql } from 'apollo-server';
 
 export const UserTypeDefs = gql`
   type Query {
@@ -20,10 +20,9 @@ export const UserTypeDefs = gql`
   }
 
   input UpdateUserInput {
+    _id: ID!
     email: String
-    fname: String
-    lname: String
-    password: String
+    newPassword: String
   }
 
   type genericResponse {
