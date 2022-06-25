@@ -56,7 +56,6 @@ export async function createOrder(request: Order) {
         stock: found.stock - order.quantity,
       };
       const result = await ProductModel.updateOne(query, update).exec();
-      console.log(result);
     } else {
       return new ApolloError(
         `Oops! This product is no longer available. ${JSON.stringify({

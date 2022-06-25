@@ -109,7 +109,6 @@ export async function getAllProducts(
   request: ProductRequest
 ): Promise<ProductResponse | ApolloError> {
   try {
-    console.log(request);
     const pageOptions: PaginateOptions = {
       page: request.page.pageNumber,
       limit: request.page.pageSize,
