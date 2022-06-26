@@ -12,6 +12,7 @@ export interface IUser {
 
 export interface UpdateRequest {
   _id: string;
+  currentPassword: string;
   email?: string;
   newPassword?: string;
 }

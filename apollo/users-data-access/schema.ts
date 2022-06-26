@@ -21,6 +21,7 @@ export const UserTypeDefs = gql`
 
   input UpdateUserInput {
     _id: ID!
+    currentPassword: String!
     email: String
     newPassword: String
   }

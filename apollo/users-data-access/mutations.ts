@@ -37,10 +37,7 @@ export const Mutation = {
           };
         } else {
           const error = result as ApolloError;
-          return {
-            message: error.message,
-            success: false,
-          };
+          return error;
         }
       }
     } catch (error) {

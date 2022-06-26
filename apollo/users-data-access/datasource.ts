@@ -82,8 +82,11 @@ export async function createUser(user: IUser) {
 
 export async function updateUser(request: UpdateRequest) {
   try {
-    const query: FilterQuery<IUser> = { _id: request._id };
-    const result = await UserModel.findById(request._id).exec();
+    const query: FilterQuery<IUser> = {
+      _id: request._id,
+      password: request.currentPassword,
+    };
+    const result = await UserModel.findOne(query).exec();
     const user = result?.toObject() as IUser;
     if (user && user._id) {
       if (request.newPassword) {
@@ -113,7 +116,9 @@ export async function updateUser(request: UpdateRequest) {
         returnDocument: 'after',
       }).exec();
     } else {
-      return new ApolloError(`User not found.`);
+      return new ApolloError(
+        `ERROR: You entered the wrong password. Please verify your current password.`
+      );
     }
   } catch (error) {
     return new ApolloError(
