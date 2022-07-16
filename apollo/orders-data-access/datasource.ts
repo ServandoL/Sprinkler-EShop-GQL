@@ -55,7 +55,12 @@ export async function createOrder(request: Order) {
       const update: UpdateQuery<IProduct> = {
         stock: found.stock - order.quantity,
       };
-      const result = await ProductModel.updateOne(query, update).exec();
+      if (found.stock < order.quantity) {
+        return new ApolloError(
+          `Oh snap! You can't order more than the available quantity.\n Please adjust your quantity for ${order.productName}`
+        );
+      }
+      await ProductModel.updateOne(query, update).exec();
     } else {
       return new ApolloError(
         `Oops! This product is no longer available. ${JSON.stringify({
