@@ -1,7 +1,8 @@
+import { ObjectId } from 'mongodb';
 import { Pagination } from '../../../interfaces/interfaces';
 
 export interface Order {
-  _id: string;
+  _id: ObjectId;
   order: CartItem[];
   shipping: Shipping;
   payment: CreditCard;

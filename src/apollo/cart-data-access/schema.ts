@@ -48,6 +48,7 @@ export const OrderTypeDefs = gql`
   }
 
   input CartInput {
+    _id: String
     email: String
     productName: String
     price: Float

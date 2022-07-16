@@ -1,31 +1,32 @@
 import { ApolloServer } from 'apollo-server';
-import mongoose from 'mongoose';
-import { CartResolvers } from './apollo/cart-data-access/resolvers';
-import { CartTypeDefs } from './apollo/cart-data-access/schema';
-import { OrderResolvers } from './apollo/orders-data-access/resolvers';
-import { OrderTypeDefs } from './apollo/orders-data-access/schema';
-import { ProductResolvers } from './apollo/products-data-access/resolvers';
-import { ProductsTypeDef } from './apollo/products-data-access/schema';
-import { UserResolvers } from './apollo/users-data-access/resolvers';
-import { UserTypeDefs } from './apollo/users-data-access/schema';
+import { MongoClient } from 'mongodb';
 import * as env from './config';
+import { CartDatasource } from './src/apollo/cart-data-access/datasource';
+import { OrderResolvers } from './src/apollo/cart-data-access/resolvers';
+import { OrderTypeDefs } from './src/apollo/cart-data-access/schema';
+
+const client: MongoClient = new MongoClient(env.connectionString);
 
 async function main() {
-  const connectionString = env.connectionString;
-  const database = env.database;
   const port = env.port;
+  const mongoClient = await client.connect();
+  if (mongoClient) {
+    const datasources = () => ({
+      cartApi: new CartDatasource(mongoClient),
+    });
+    const server = new ApolloServer({
+      typeDefs: [OrderTypeDefs],
+      resolvers: [OrderResolvers],
+      dataSources: datasources,
+      introspection: true,
+    });
 
-  await mongoose.connect(connectionString, { dbName: database });
-
-  const server = new ApolloServer({
-    typeDefs: [ProductsTypeDef, UserTypeDefs, CartTypeDefs, OrderTypeDefs],
-    resolvers: [ProductResolvers, UserResolvers, CartResolvers, OrderResolvers],
-    introspection: true,
-  });
-
-  server.listen({ port: port }).then(({ url }) => {
-    console.log(`index:`, `Apollo server listening on ${url}`);
-  });
+    server.listen({ port: port }).then(({ url }) => {
+      console.log(`index:`, `Apollo server listening on ${url}`);
+    });
+  } else {
+    console.log('index', 'There was an error connecting to Mongo.');
+  }
 }
 
 main().catch((error) => {
@@ -40,10 +41,8 @@ main().catch((error) => {
 process.on('SIGINT', gracefulDisconnect).on('SIGTERM', gracefulDisconnect);
 
 function gracefulDisconnect() {
-  mongoose.connection.close(() => {
-    console.log(
-      `Mongoose connection was disconnected through app termination.`
-    );
+  client.close(() => {
+    console.log(`Mongo connection was disconnected through app termination.`);
     process.exit(0);
   });
 }

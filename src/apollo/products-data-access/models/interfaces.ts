@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { Pagination } from '../../../interfaces/interfaces';
 
 export interface ProductResponse {
