@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import { Pagination } from '../../../interfaces/interfaces';
 
 export interface ProductResponse {

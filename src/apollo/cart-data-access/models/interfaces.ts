@@ -1,34 +1,6 @@
-import { ObjectId } from 'mongodb';
-import { Pagination } from '../../../interfaces/interfaces';
-
-export interface Order {
-  _id: ObjectId;
-  order: CartItem[];
-  shipping: Shipping;
-  payment: CreditCard;
-  email: string;
-  orderedDate: string;
-  total: number;
-  orderId: string;
-}
-
-export interface Shipping {
-  address: string;
-  address2?: string;
-  city: string;
-  state: string;
-  zipCode: string;
-}
-
-export interface CreditCard {
-  cardNumber: string;
-  month: string;
-  year: string;
-  cvv: string;
-}
-
 export interface CartItem {
   _id: string;
+  email?: string;
   productName: string;
   price: number;
   category: string;
@@ -38,15 +10,21 @@ export interface CartItem {
   quantity: number;
 }
 
-export interface OrderHistoryRequest {
+export interface Cart {
+  _id: string;
+  cart: CartItem[];
   email: string;
-  page: {
-    pageSize: number;
-    pageNumber: number;
-  };
+  createdDate?: string;
+  updated?: boolean;
 }
 
-export interface OrderHistoryResponse {
-  data: Order[];
-  pagination: Pagination;
+export interface SaveCartRequest {
+  email: string;
+  cart: CartItem[];
+}
+
+export interface UpdateQuantityRequest {
+  _id: string;
+  email: string;
+  quantity: number;
 }

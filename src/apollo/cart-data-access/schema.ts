@@ -1,50 +1,38 @@
 import { gql } from 'apollo-server';
 
-export const OrderTypeDefs = gql`
+export const CartTypeDefs = gql`
   type Query {
-    orders(orderHistoryRequest: OrderHistoryRequest): getOrderResponse
+    getCart(email: String): getCartResponse
   }
 
   type Mutation {
-    createOrder(request: OrderInput): genericResponse
+    saveCart(request: SaveCartRequest): genericResponse
+    addToCart(request: AddToCartInput): genericResponse
+    clearCart(email: String): genericResponse
+    updateCart(request: CartInput): genericResponse
   }
 
-  input OrderHistoryRequest {
+  input SaveCartRequest {
+    cart: [CartInput]
     email: String
-    page: Page
   }
 
-  type getOrderResponse {
-    data: [OrderType]
-    pagination: Pagination
-  }
-
-  type genericResponse {
-    message: String
-    success: Boolean
-  }
-
-  input OrderInput {
+  input UpdateCartQuantity {
     email: String
-    order: [CartInput]
-    shipping: ShippingInput
-    payment: PaymentInput
-    total: Float
+    _id: ID
+    quantity: Int
   }
 
-  input ShippingInput {
-    address: String
-    address2: String
-    city: String
-    state: String
-    zipCode: String
-  }
-
-  input PaymentInput {
-    cardNumber: String
-    month: String
-    year: String
-    cvv: String
+  input AddToCartInput {
+    _id: String
+    email: String
+    quantity: Int
+    productName: String
+    price: Float
+    category: String
+    brand: String
+    stock: Int
+    imageUrl: String
   }
 
   input CartInput {
@@ -59,35 +47,18 @@ export const OrderTypeDefs = gql`
     quantity: Int
   }
 
-  type OrderType {
-    _id: ID
-    order: [Cart]
-    shipping: ShippingType
-    payment: PaymentType
+  type genericResponse {
+    message: String
+    success: Boolean
+  }
+
+  type getCartResponse {
+    cart: [Cart]
     email: String
-    orderedDate: String
-    total: Float
-    orderId: String
-  }
-
-  type ShippingType {
-    address: String
-    address2: String
-    city: String
-    state: String
-    zipCode: String
-  }
-
-  type PaymentType {
-    cardNumber: String
-    month: String
-    year: String
-    cvv: String
   }
 
   type Cart {
     _id: ID
-    email: String
     productName: String
     price: Float
     category: String
@@ -95,23 +66,5 @@ export const OrderTypeDefs = gql`
     stock: Int
     imageUrl: String
     quantity: Int
-  }
-
-  input Page {
-    pageSize: Int
-    pageNumber: Int
-  }
-
-  type Pagination {
-    totalDocs: Int
-    limit: Int
-    hasPrevPage: Boolean
-    hasNextPage: Boolean
-    page: Int
-    totalPages: Int
-    offset: Int
-    prevPage: Int
-    nextPage: Int
-    pagingCounter: Int
   }
 `;

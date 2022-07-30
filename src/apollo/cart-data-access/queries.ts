@@ -1,17 +1,29 @@
-import { ApolloError } from 'apollo-server';
-import { CartDatasource } from './datasource';
-import { OrderHistoryRequest } from './models/interfaces';
+import { ApolloError } from "apollo-server";
+import { CartDatasource } from "./datasource";
 
 export const Query = {
-  orders: async (
+  getCart: async (
     parent: any,
-    args: { orderHistoryRequest: OrderHistoryRequest },
+    args: { email: string },
     { dataSources }: any
   ) => {
     try {
-      const cartApi = dataSources.cartApi as CartDatasource;
-      const result = await cartApi.getOrders(args.orderHistoryRequest);
-      return result;
+      const client: CartDatasource = dataSources.cartApi;
+      const result = await client.getCart(args.email);
+      if (result instanceof ApolloError) {
+        return result;
+      }
+      if (!!result) {
+        return {
+          cart: result.cart,
+          email: result.email,
+        };
+      } else {
+        return {
+          cart: [],
+          email: args.email,
+        };
+      }
     } catch (error) {
       return error;
     }
