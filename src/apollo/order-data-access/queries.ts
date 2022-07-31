@@ -9,7 +9,7 @@ export const Query = {
     { dataSources }: any
   ) => {
     try {
-      const orderApi = dataSources.orderApi as OrderDatasource;
+      const orderApi: OrderDatasource = dataSources.orderApi;
       const result = await orderApi.getOrders(args.orderHistoryRequest);
       return result;
     } catch (error) {

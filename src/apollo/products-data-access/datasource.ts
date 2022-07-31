@@ -1,4 +1,4 @@
-import { DataSource } from "apollo-datasource";
+import { DataSource } from 'apollo-datasource';
 import {
   MongoClient,
   Collection,
@@ -9,7 +9,7 @@ import {
   UpdateFilter,
   ModifyResult,
   ObjectId,
-} from "mongodb";
+} from 'mongodb';
 import {
   AddProductRequest,
   DeleteRequest,
@@ -18,19 +18,19 @@ import {
   ProductRequest,
   ProductResponse,
   UpdateProductRequest,
-} from "./models/interfaces";
-import * as env from "../../../config";
-import { ApolloError } from "apollo-server";
-import to from "await-to-js";
-import { BRAND, CATEGORY } from "./constants";
-import { Page, PaginatedResponse } from "../../interfaces/interfaces";
-import { Paginate } from "../../common/pagination";
+} from './models/interfaces';
+import * as env from '../../../config';
+import { ApolloError } from 'apollo-server';
+import to from 'await-to-js';
+import { BRAND, CATEGORY } from './constants';
+import { Page, PaginatedResponse } from '../../interfaces/interfaces';
+import { Paginate } from '../../common/pagination';
 
 export class ProductDatasource extends DataSource {
   client!: MongoClient;
   collection!: Collection<IProduct>;
   db!: Db;
-  loc = "ProductDatasource";
+  loc = 'ProductDatasource';
   constructor(client: MongoClient) {
     super();
     this.client = client;
@@ -93,8 +93,10 @@ export class ProductDatasource extends DataSource {
         pageNumber: request.page.pageNumber,
         pageSize: request.page.pageSize,
       };
-      const query: Filter<ProductRequest> =
-        request.category !== undefined ? { category: request.category } : {};
+      const query: Filter<IProduct> =
+        request.category !== undefined
+          ? { category: request.category, isDeleted: false }
+          : {};
 
       const searchAggregate: Document[] = [
         {
