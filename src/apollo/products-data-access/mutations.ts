@@ -49,7 +49,7 @@ export const Mutation = {
       if (result instanceof ApolloError) {
         return result;
       }
-      if (result?.ok && result?.value?.isDeleted) {
+      if (result && result.ok) {
         return {
           message: "Product deleted successfully.",
           success: true,

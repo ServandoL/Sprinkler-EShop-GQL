@@ -48,12 +48,12 @@ export class CartDatasource extends DataSource {
   async saveCart(request: SaveCartRequest) {
     try {
       const query: Filter<Cart> = { email: request.email };
-      const [error, data] = await to(this.collection.find(query).toArray());
+      const [error, data] = await to(this.collection.findOne(query));
       if (error) {
         return new ApolloError(`
             An error occurred while trying to save to your cart.`);
       } else {
-        if (!data?.length) {
+        if (!data) {
           const result = await this.collection.insertOne({
             email: request.email,
             cart: request.cart,
@@ -62,6 +62,25 @@ export class CartDatasource extends DataSource {
           });
           if (result.acknowledged && result.insertedId) {
             return true;
+          }
+          return false;
+        } else {
+          const toUpdate: CartItem[] = request.cart;
+          for (const product of toUpdate) {
+            const error = await this.validateQuantityOnHand(product);
+            if (error instanceof ApolloError) {
+              return error
+            }
+          }
+          const update: UpdateFilter<Cart> = {
+            $set: {
+              ...data,
+              cart: toUpdate
+            }
+          }
+          const result = await this.collection.findOneAndUpdate(query, update);
+          if (result && result.ok) {
+            return true
           }
           return false;
         }
