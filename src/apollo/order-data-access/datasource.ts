@@ -2,6 +2,7 @@ import { DataSource } from 'apollo-datasource';
 import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
 import {
+  ClientSession,
   Collection,
   Db,
   Document,
@@ -31,7 +32,7 @@ export class OrderDatasource extends DataSource {
   }
 
   async getOrders(request: OrderHistoryRequest) {
-    const query: Filter<Order> = { email: request.email };
+    const query: Filter<Order> = { userId: request.userId };
     const pageOptions: Page = {
       pageNumber: request.page.pageNumber,
       pageSize: request.page.pageSize,
@@ -54,52 +55,93 @@ export class OrderDatasource extends DataSource {
 
   async createOrder(request: Order) {
     const productCollection: Collection<IProduct> = this.db.collection(env.productsCollection);
-    for (const order of request.order) {
-      const error = await this.validateQuantityOnHand(order);
-      if (error instanceof ApolloError) {
-        console.log(
-          this.loc + '.saveCart',
-          `Error validating quantities for ${JSON.stringify(order)}`
+    const transactionSession: ClientSession = this.client.startSession();
+
+    try {
+      console.log(
+        this.loc + '.createOrder',
+        `Transaction started. ${JSON.stringify(new Date().toISOString())}`
+      );
+      const [error, data] = await to(
+        transactionSession.withTransaction(async () => {
+          for (const order of request.order) {
+            const error = await this.validateQuantityOnHand(order, transactionSession);
+            if (error instanceof ApolloError) {
+              console.log(
+                this.loc + '.saveCart',
+                `Error validating quantities for ${JSON.stringify(order)}`
+              );
+              return new ApolloError(error + ` Item: ${order.productName}`);
+            }
+          }
+          for (const order of request.order) {
+            const filter: Filter<IProduct> = { _id: order._id.toString() };
+            const found = await productCollection.findOne(filter, { session: transactionSession });
+            if (found?._id) {
+              const update: UpdateFilter<IProduct> = {
+                $set: {
+                  stock: found.stock - order.quantity,
+                },
+              };
+              await productCollection.updateOne(filter, update, { session: transactionSession });
+            }
+          }
+
+          const doc: Order = {
+            ...request,
+            userId: request.userId.toString(),
+            orderedDate: new Date().toISOString(),
+            orderId: new ObjectId().toString(),
+            order: [...request.order],
+          };
+          const [error, data] = await to(
+            this.collection.insertOne(doc, { session: transactionSession })
+          );
+          if (error) {
+            return new ApolloError(
+              `An error occurred while processing your order. Please try again. ${JSON.stringify(
+                error
+              )}`
+            );
+          } else {
+            const filter: Filter<Cart> = { email: request.email };
+            await this.db
+              .collection(env.cartCollection)
+              .deleteOne(filter, { session: transactionSession });
+            return data;
+          }
+        })
+      );
+      if (error) {
+        return new ApolloError(
+          `An error occurred while processing your order. Please try again. ${JSON.stringify(
+            error
+          )}`
         );
-        return new ApolloError(error + ` Item: ${order.productName}`);
+      } else {
+        return data;
       }
-    }
-    for (const order of request.order) {
-      const filter: Filter<IProduct> = { _id: order._id.toString() };
-      const found = await productCollection.findOne(filter);
-      if (found?._id) {
-        const update: UpdateFilter<IProduct> = {
-          $set: {
-            stock: found.stock - order.quantity,
-          },
-        };
-        await productCollection.updateOne(filter, update);
-      }
-    }
-    const doc: Order = {
-      ...request,
-      orderedDate: new Date().toISOString(),
-      orderId: new ObjectId().toString(),
-      order: [...request.order],
-    };
-    const [error, data] = await to(this.collection.insertOne(doc));
-    if (error) {
+    } catch (error) {
       return new ApolloError(
         `An error occurred while processing your order. Please try again. ${JSON.stringify(error)}`
       );
-    } else {
-      const filter: Filter<Cart> = { email: request.email };
-      await this.db.collection(env.cartCollection).deleteOne(filter);
-      return data;
+    } finally {
+      console.log(
+        this.loc + '.createOrder',
+        `Transaction ended. ${JSON.stringify(new Date().toISOString())}`
+      );
+      await transactionSession.endSession();
     }
   }
 
-  async validateQuantityOnHand(request: CartItem) {
+  async validateQuantityOnHand(request: CartItem, session: ClientSession) {
     try {
       const query: Filter<IProduct> = { _id: request._id };
+
       const [error, data] = await to(
-        this.db.collection<IProduct>(env.productsCollection).findOne(query)
+        this.db.collection<IProduct>(env.productsCollection).findOne(query, { session })
       );
+
       if (error) {
         return new ApolloError(`An error occurred while trying to validate quantities.`);
       } else {

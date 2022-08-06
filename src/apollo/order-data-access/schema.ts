@@ -10,7 +10,7 @@ export const OrderTypeDefs = gql`
   }
 
   input OrderHistoryRequest {
-    email: String
+    userId: String
     page: Page
   }
 
@@ -25,6 +25,7 @@ export const OrderTypeDefs = gql`
   }
 
   input OrderInput {
+    userId: String
     email: String
     order: [CartInput]
     shipping: ShippingInput

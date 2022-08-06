@@ -3,6 +3,7 @@ import { Pagination } from '../../../interfaces/interfaces';
 
 export interface Order {
   _id: ObjectId;
+  userId: string;
   order: CartItem[];
   shipping: Shipping;
   payment: CreditCard;
@@ -39,7 +40,7 @@ export interface CartItem {
 }
 
 export interface OrderHistoryRequest {
-  email: string;
+  userId: string;
   page: {
     pageSize: number;
     pageNumber: number;
