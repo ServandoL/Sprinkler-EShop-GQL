@@ -2,7 +2,12 @@ import { ApolloError } from 'apollo-server';
 import { Collection, Document } from 'mongodb';
 import { Page, PaginatedResponse } from '../interfaces/interfaces';
 
-export async function Paginate(collection: Collection<any>, aggregate: Document[], pagination: Page, sort?: any) {
+export async function Paginate(
+  collection: Collection<any>,
+  aggregate: Document[],
+  pagination: Page,
+  sort?: any
+) {
   try {
     const skips = pagination.pageSize * (pagination.pageNumber - 1);
     const countResults = await countDocuments(collection, aggregate);

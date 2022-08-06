@@ -26,7 +26,11 @@ export const Mutation = {
       return error;
     }
   },
-  updateUserInformation: async (parent: any, args: { request: UpdateRequest }, { dataSources }: any) => {
+  updateUserInformation: async (
+    parent: any,
+    args: { request: UpdateRequest },
+    { dataSources }: any
+  ) => {
     try {
       const client: UserDatasource = dataSources.userApi;
       const result = await client.updateUser(args.request);
@@ -40,9 +44,13 @@ export const Mutation = {
             success: true,
           };
         }
-        return new ApolloError(`An error occurred while trying to update your account. Please try again.`);
+        return new ApolloError(
+          `An error occurred while trying to update your account. Please try again.`
+        );
       }
-      return new ApolloError(`An error occurred while trying to update your account. Please try again.`);
+      return new ApolloError(
+        `An error occurred while trying to update your account. Please try again.`
+      );
     } catch (error) {
       return error;
     }
