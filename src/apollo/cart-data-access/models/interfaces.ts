@@ -16,6 +16,8 @@ export interface Cart {
   email: string;
   createdDate?: string;
   updated?: boolean;
+  dateProcessed?: string;
+  processedInd?: boolean;
 }
 
 export interface SaveCartRequest {

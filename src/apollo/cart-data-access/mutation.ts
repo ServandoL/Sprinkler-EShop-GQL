@@ -97,7 +97,9 @@ export const Mutation = {
           success: true,
         };
       } else {
-        return new ApolloError(`An error occurred while trying to update your cart. Please try again.`);
+        return new ApolloError(
+          `An error occurred while trying to update your cart. Please try again.`
+        );
       }
     } catch (error) {
       return error;

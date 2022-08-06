@@ -23,12 +23,16 @@ export class CartDatasource extends DataSource {
     try {
       const [error, data] = await to(this.collection.findOne(query));
       if (error) {
-        return new ApolloError(`An error occurred while retrieving your cart. ${JSON.stringify(error)}`);
+        return new ApolloError(
+          `An error occurred while retrieving your cart. ${JSON.stringify(error)}`
+        );
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(`An error occurred while retrieving your cart. ${JSON.stringify(error)}`);
+      return new ApolloError(
+        `An error occurred while retrieving your cart. ${JSON.stringify(error)}`
+      );
     }
   }
 
@@ -41,6 +45,16 @@ export class CartDatasource extends DataSource {
             An error occurred while trying to save to your cart.`);
       } else {
         if (!data) {
+          for (const cartItem of request.cart) {
+            const error = await this.validateQuantityOnHand(cartItem);
+            if (error instanceof ApolloError) {
+              console.log(
+                this.loc + '.saveCart',
+                `Error validating quantities for ${JSON.stringify(cartItem)}`
+              );
+              return new ApolloError(error + ` Item: ${cartItem.productName}`);
+            }
+          }
           const result = await this.collection.insertOne({
             email: request.email,
             cart: request.cart,
@@ -71,10 +85,11 @@ export class CartDatasource extends DataSource {
           }
           return false;
         }
-        return false;
       }
     } catch (error) {
-      return new ApolloError(`An error occurred while trying to save to your cart. ${JSON.stringify(error)}`);
+      return new ApolloError(
+        `An error occurred while trying to save to your cart. ${JSON.stringify(error)}`
+      );
     }
   }
 
@@ -87,7 +102,9 @@ export class CartDatasource extends DataSource {
       }
       return false;
     } catch (error) {
-      return new ApolloError(`An error occurred while trying to delete your cart. ${JSON.stringify(error)}`);
+      return new ApolloError(
+        `An error occurred while trying to delete your cart. ${JSON.stringify(error)}`
+      );
     }
   }
 
@@ -99,11 +116,17 @@ export class CartDatasource extends DataSource {
     }
     const [error, data] = await to(this.collection.findOne(query));
     if (error) {
-      return new ApolloError(`An error occurred while trying to update your cart. ${JSON.stringify(error)}`);
+      return new ApolloError(
+        `An error occurred while trying to update your cart. ${JSON.stringify(error)}`
+      );
     } else {
       const cartItems: CartItem[] = data?.cart || [];
-      const toUpdate: CartItem | undefined = cartItems.find((product) => product._id === request._id);
-      const updatedCart: CartItem[] = cartItems.map((product) => (product._id === toUpdate?._id ? toUpdate : product));
+      const toUpdate: CartItem | undefined = cartItems.find(
+        (product) => product._id === request._id
+      );
+      const updatedCart: CartItem[] = cartItems.map((product) =>
+        product._id === toUpdate?._id ? toUpdate : product
+      );
       const cartQuery: Filter<Cart> = { email: request.email };
       const update: UpdateFilter<Cart> = {
         $set: {
@@ -124,10 +147,14 @@ export class CartDatasource extends DataSource {
       const query: Filter<Cart> = { email: request.email };
       const [error, data] = await to(this.collection.findOne(query));
       if (error) {
-        return new ApolloError(`An error ocurred while trying to add to your cart. ${JSON.stringify(error)}`);
+        return new ApolloError(
+          `An error ocurred while trying to add to your cart. ${JSON.stringify(error)}`
+        );
       } else {
         const cartItems: CartItem[] = data?.cart || [];
-        const exists: CartItem | undefined = cartItems.find((product) => product._id === request._id);
+        const exists: CartItem | undefined = cartItems.find(
+          (product) => product._id === request._id
+        );
         if (!!exists) {
           return await this.updateCartQuantity(exists);
         }
@@ -142,14 +169,18 @@ export class CartDatasource extends DataSource {
         return await this.collection.findOneAndUpdate(query, update);
       }
     } catch (error) {
-      return new ApolloError(`An error occurred while trying to add to your cart. ${JSON.stringify(error)}`);
+      return new ApolloError(
+        `An error occurred while trying to add to your cart. ${JSON.stringify(error)}`
+      );
     }
   }
 
   async validateQuantityOnHand(request: CartItem) {
     try {
       const query: Filter<IProduct> = { _id: request._id };
-      const [error, data] = await to(this.db.collection<IProduct>(env.productsCollection).findOne(query));
+      const [error, data] = await to(
+        this.db.collection<IProduct>(env.productsCollection).findOne(query)
+      );
       if (error) {
         return new ApolloError(`An error occurred while trying to validate quantities.`);
       } else {
@@ -160,12 +191,16 @@ export class CartDatasource extends DataSource {
           return new ApolloError(`You cannot have a quantity of 0 or lower.`);
         }
         if (request.quantity > data.stock) {
-          return new ApolloError(`Quantity ordered is greater than the available on hand quantity.`);
+          return new ApolloError(
+            `Quantity ordered is greater than the available on hand quantity.`
+          );
         }
         return true;
       }
     } catch (error) {
-      return new ApolloError(`An error occurred while trying to validate quantities. ${JSON.stringify(error)}`);
+      return new ApolloError(
+        `An error occurred while trying to validate quantities. ${JSON.stringify(error)}`
+      );
     }
   }
 }
