@@ -1,16 +1,7 @@
 import { DataSource } from 'apollo-datasource';
 import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
-import {
-  Collection,
-  Db,
-  Document,
-  Filter,
-  MongoClient,
-  ObjectId,
-  UpdateFilter,
-  UpdateOneModel,
-} from 'mongodb';
+import { Collection, Db, Document, Filter, MongoClient, ObjectId, UpdateFilter, UpdateOneModel } from 'mongodb';
 import * as env from '../../../config';
 import { Paginate } from '../../common/pagination';
 import { Page } from '../../interfaces/interfaces';
@@ -42,13 +33,8 @@ export class OrderDatasource extends DataSource {
         },
       },
     ];
-    console.log(
-      `${this.loc}.getOrders`,
-      `aggregate: ${JSON.stringify(aggregate)}`
-    );
-    const [error, data] = await to(
-      Paginate(this.collection, aggregate, pageOptions)
-    );
+    console.log(`${this.loc}.getOrders`, `aggregate: ${JSON.stringify(aggregate)}`);
+    const [error, data] = await to(Paginate(this.collection, aggregate, pageOptions));
     if (error) {
       return new ApolloError(JSON.stringify(error));
     } else {
@@ -57,9 +43,7 @@ export class OrderDatasource extends DataSource {
   }
 
   async createOrder(request: Order) {
-    const productCollection: Collection<IProduct> = this.db.collection(
-      env.productsCollection
-    );
+    const productCollection: Collection<IProduct> = this.db.collection(env.productsCollection);
     for (const order of request.order) {
       const filter: Filter<IProduct> = { _id: order._id };
       const found = await productCollection.findOne(filter);
@@ -98,9 +82,7 @@ export class OrderDatasource extends DataSource {
     const [error, data] = await to(this.collection.insertOne(doc));
     if (error) {
       return new ApolloError(
-        `An error occurred while processing your order. Please try again. ${JSON.stringify(
-          error
-        )}`
+        `An error occurred while processing your order. Please try again. ${JSON.stringify(error)}`
       );
     } else {
       return data;

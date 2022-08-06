@@ -2,11 +2,7 @@ import { ApolloError } from 'apollo-server';
 import { UserDatasource } from './datasource';
 
 export const Query = {
-  getUser: async (
-    parent: any,
-    args: { email: string; password: string },
-    { dataSources }: any
-  ) => {
+  getUser: async (parent: any, args: { email: string; password: string }, { dataSources }: any) => {
     try {
       const client: UserDatasource = dataSources.userApi;
       const result = await client.getUser(args.email, args.password);
@@ -27,9 +23,7 @@ export const Query = {
           user: result,
         };
       }
-      return new ApolloError(
-        `An error occurred while trying to retrieve your account.`
-      );
+      return new ApolloError(`An error occurred while trying to retrieve your account.`);
     } catch (error) {
       return error;
     }

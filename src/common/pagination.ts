@@ -2,12 +2,7 @@ import { ApolloError } from 'apollo-server';
 import { Collection, Document } from 'mongodb';
 import { Page, PaginatedResponse } from '../interfaces/interfaces';
 
-export async function Paginate(
-  collection: Collection<any>,
-  aggregate: Document[],
-  pagination: Page,
-  sort?: any
-) {
+export async function Paginate(collection: Collection<any>, aggregate: Document[], pagination: Page, sort?: any) {
   try {
     const skips = pagination.pageSize * (pagination.pageNumber - 1);
     const countResults = await countDocuments(collection, aggregate);
@@ -16,11 +11,7 @@ export async function Paginate(
     }
     console.log('totalElements', countResults);
 
-    const pipeline = [
-      ...aggregate,
-      { $skip: skips },
-      { $limit: pagination.pageSize },
-    ];
+    const pipeline = [...aggregate, { $skip: skips }, { $limit: pagination.pageSize }];
     console.log('Query:', JSON.stringify(pipeline, null, 1));
     const paginated = await collection.aggregate(pipeline).toArray();
 
@@ -70,10 +61,7 @@ async function countDocuments(collection: Collection, aggregate: Document[]) {
     }
     return count[0].totalElements as number;
   } catch (error) {
-    console.log(
-      'countDocuments',
-      'Mongo error occurred while counting all documents.'
-    );
+    console.log('countDocuments', 'Mongo error occurred while counting all documents.');
     return new ApolloError(JSON.stringify(error));
   }
 }

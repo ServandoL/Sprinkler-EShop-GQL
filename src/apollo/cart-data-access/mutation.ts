@@ -1,9 +1,6 @@
-import { ApolloError } from "apollo-server";
-import { CartDatasource } from "./datasource";
-import {
-  CartItem,
-  SaveCartRequest,
-} from "./models/interfaces";
+import { ApolloError } from 'apollo-server';
+import { CartDatasource } from './datasource';
+import { CartItem, SaveCartRequest } from './models/interfaces';
 
 export const Mutation = {
   saveCart: async (
@@ -21,7 +18,7 @@ export const Mutation = {
       }
       if (result) {
         return {
-          message: "Your cart was saved successfully.",
+          message: 'Your cart was saved successfully.',
           success: true,
         };
       }
@@ -47,13 +44,11 @@ export const Mutation = {
       } else {
         if (result.ok) {
           return {
-            message: "Successfully updated your cart.",
+            message: 'Successfully updated your cart.',
             success: true,
           };
         }
-        return new ApolloError(
-          `There was an error while trying to update your cart.`
-        );
+        return new ApolloError(`There was an error while trying to update your cart.`);
       }
     } catch (error) {
       return error;
@@ -74,7 +69,7 @@ export const Mutation = {
       }
       if (result) {
         return {
-          message: "Successfully cleared your cart.",
+          message: 'Successfully cleared your cart.',
           success: true,
         };
       }
@@ -98,13 +93,11 @@ export const Mutation = {
       }
       if (result.ok) {
         return {
-          message: "Successfully updated your cart.",
+          message: 'Successfully updated your cart.',
           success: true,
         };
       } else {
-        return new ApolloError(
-          `An error occurred while trying to update your cart. Please try again.`
-        );
+        return new ApolloError(`An error occurred while trying to update your cart. Please try again.`);
       }
     } catch (error) {
       return error;

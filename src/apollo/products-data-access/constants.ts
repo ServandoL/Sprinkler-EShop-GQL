@@ -1,2 +1,2 @@
-export const BRAND = "brand";
-export const CATEGORY = "category";
+export const BRAND = 'brand';
+export const CATEGORY = 'category';

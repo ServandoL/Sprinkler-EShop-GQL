@@ -47,25 +47,15 @@ export class ProductDatasource extends DataSource {
       };
       const [error, data] = await to(this.collection.find().toArray());
       if (error) {
-        return new ApolloError(
-          `An error occurred while retrieving the product filters. ${JSON.stringify(
-            error
-          )}`
-        );
+        return new ApolloError(`An error occurred while retrieving the product filters. ${JSON.stringify(error)}`);
       } else {
         request.forEach((filter) => {
           if (data) {
             data.forEach((product) => {
-              if (
-                filter === BRAND &&
-                !response.brands.includes(product.brand)
-              ) {
+              if (filter === BRAND && !response.brands.includes(product.brand)) {
                 response.brands.push(product.brand);
               }
-              if (
-                filter === CATEGORY &&
-                !response.categories.includes(product.category)
-              ) {
+              if (filter === CATEGORY && !response.categories.includes(product.category)) {
                 response.categories.push(product.category);
               }
             });
@@ -77,26 +67,18 @@ export class ProductDatasource extends DataSource {
         } as FilterResponse;
       }
     } catch (error) {
-      return new ApolloError(
-        `An error occurred while retrieving the products. ${JSON.stringify(
-          error
-        )}`
-      );
+      return new ApolloError(`An error occurred while retrieving the products. ${JSON.stringify(error)}`);
     }
   }
 
-  async getProducts(
-    request: ProductRequest
-  ): Promise<PaginatedResponse | ApolloError | undefined> {
+  async getProducts(request: ProductRequest): Promise<PaginatedResponse | ApolloError | undefined> {
     try {
       const pageOptions: Page = {
         pageNumber: request.page.pageNumber,
         pageSize: request.page.pageSize,
       };
       const query: Filter<IProduct> =
-        request.category !== undefined
-          ? { category: request.category, isDeleted: false }
-          : {};
+        request.category !== undefined ? { category: request.category, isDeleted: false } : {};
 
       const searchAggregate: Document[] = [
         {
@@ -106,31 +88,19 @@ export class ProductDatasource extends DataSource {
         },
       ];
 
-      const [error, data] = await to(
-        Paginate(this.collection, searchAggregate, pageOptions)
-      );
+      const [error, data] = await to(Paginate(this.collection, searchAggregate, pageOptions));
 
       if (error) {
-        return new ApolloError(
-          `An error occurred while retrieving the products. ${JSON.stringify(
-            error
-          )}`
-        );
+        return new ApolloError(`An error occurred while retrieving the products. ${JSON.stringify(error)}`);
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
-        `An error occurred while retrieving the products. ${JSON.stringify(
-          error
-        )}`
-      );
+      return new ApolloError(`An error occurred while retrieving the products. ${JSON.stringify(error)}`);
     }
   }
 
-  async getAllProducts(
-    request: ProductRequest
-  ): Promise<PaginatedResponse | ApolloError | undefined> {
+  async getAllProducts(request: ProductRequest): Promise<PaginatedResponse | ApolloError | undefined> {
     try {
       const pageOptions: Page = {
         pageNumber: request.page.pageNumber,
@@ -141,30 +111,18 @@ export class ProductDatasource extends DataSource {
           $match: {},
         },
       ];
-      const [error, data] = await to(
-        Paginate(this.collection, searchAggregate, pageOptions)
-      );
+      const [error, data] = await to(Paginate(this.collection, searchAggregate, pageOptions));
       if (error) {
-        return new ApolloError(
-          `An error occurred while retrieving the products. ${JSON.stringify(
-            error
-          )}`
-        );
+        return new ApolloError(`An error occurred while retrieving the products. ${JSON.stringify(error)}`);
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
-        `An error occurred while retrieving the products. ${JSON.stringify(
-          error
-        )}`
-      );
+      return new ApolloError(`An error occurred while retrieving the products. ${JSON.stringify(error)}`);
     }
   }
 
-  async softDeleteProduct(
-    request: DeleteRequest
-  ): Promise<ModifyResult<IProduct> | undefined | ApolloError> {
+  async softDeleteProduct(request: DeleteRequest): Promise<ModifyResult<IProduct> | undefined | ApolloError> {
     try {
       const filter: Filter<IProduct> = {
         _id: request.product._id.toString(),
@@ -176,24 +134,14 @@ export class ProductDatasource extends DataSource {
           deleted_date: new Date().toISOString(),
         },
       };
-      const [error, data] = await to(
-        this.collection.findOneAndUpdate(filter, update)
-      );
+      const [error, data] = await to(this.collection.findOneAndUpdate(filter, update));
       if (error) {
-        return new ApolloError(
-          `An error occurred while retrieving the products. ${JSON.stringify(
-            error
-          )}`
-        );
+        return new ApolloError(`An error occurred while retrieving the products. ${JSON.stringify(error)}`);
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
-        `An error occurred while retrieving the products. ${JSON.stringify(
-          error
-        )}`
-      );
+      return new ApolloError(`An error occurred while retrieving the products. ${JSON.stringify(error)}`);
     }
   }
 
@@ -207,20 +155,12 @@ export class ProductDatasource extends DataSource {
         })
       );
       if (error) {
-        return new ApolloError(
-          `'An error occurred trying to add the product.' ${JSON.stringify(
-            error
-          )}`
-        );
+        return new ApolloError(`'An error occurred trying to add the product.' ${JSON.stringify(error)}`);
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
-        `'An error occurred trying to add the product.' ${JSON.stringify(
-          error
-        )}`
-      );
+      return new ApolloError(`'An error occurred trying to add the product.' ${JSON.stringify(error)}`);
     }
   }
 
@@ -229,11 +169,7 @@ export class ProductDatasource extends DataSource {
       const filter: Filter<IProduct> = { _id: request.productId };
       const [error, data] = await to(this.collection.findOne(filter));
       if (error) {
-        return new ApolloError(
-          `An error occurred while trying to update this product. ${JSON.stringify(
-            error
-          )}`
-        );
+        return new ApolloError(`An error occurred while trying to update this product. ${JSON.stringify(error)}`);
       } else {
         const { modified, ...product } = data as unknown as IProduct;
         if (modified) {
@@ -248,11 +184,7 @@ export class ProductDatasource extends DataSource {
         }
       }
     } catch (error) {
-      return new ApolloError(
-        `An error occurred while trying to update this product. ${JSON.stringify(
-          error
-        )}`
-      );
+      return new ApolloError(`An error occurred while trying to update this product. ${JSON.stringify(error)}`);
     }
   }
 }

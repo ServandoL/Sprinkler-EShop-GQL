@@ -1,5 +1,5 @@
-import { ProductDatasource } from "./datasource";
-import { ProductRequest } from "./models/interfaces";
+import { ProductDatasource } from './datasource';
+import { ProductRequest } from './models/interfaces';
 
 export const Query = {
   products: async (

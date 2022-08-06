@@ -1,12 +1,8 @@
-import { ApolloError } from "apollo-server";
-import { CartDatasource } from "./datasource";
+import { ApolloError } from 'apollo-server';
+import { CartDatasource } from './datasource';
 
 export const Query = {
-  getCart: async (
-    parent: any,
-    args: { email: string },
-    { dataSources }: any
-  ) => {
+  getCart: async (parent: any, args: { email: string }, { dataSources }: any) => {
     try {
       const client: CartDatasource = dataSources.cartApi;
       const result = await client.getCart(args.email);

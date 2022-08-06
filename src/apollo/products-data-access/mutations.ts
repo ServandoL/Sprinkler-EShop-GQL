@@ -1,10 +1,6 @@
-import { ApolloError } from "apollo-server";
-import { ProductDatasource } from "./datasource";
-import {
-  AddProductRequest,
-  DeleteRequest,
-  UpdateProductRequest,
-} from "./models/interfaces";
+import { ApolloError } from 'apollo-server';
+import { ProductDatasource } from './datasource';
+import { AddProductRequest, DeleteRequest, UpdateProductRequest } from './models/interfaces';
 
 export const Mutation = {
   addProduct: async (
@@ -23,12 +19,12 @@ export const Mutation = {
       }
       if (result?.acknowledged && result?.insertedId) {
         return {
-          message: "Product added successfully.",
+          message: 'Product added successfully.',
           success: true,
         };
       }
       return {
-        message: "An error occurred trying to add the product.",
+        message: 'An error occurred trying to add the product.',
         success: false,
       };
     } catch (error) {
@@ -51,12 +47,12 @@ export const Mutation = {
       }
       if (result && result.ok) {
         return {
-          message: "Product deleted successfully.",
+          message: 'Product deleted successfully.',
           success: true,
         };
       }
       return {
-        message: "There was an error deleting this product.",
+        message: 'There was an error deleting this product.',
         success: false,
       };
     } catch (error) {
@@ -78,13 +74,11 @@ export const Mutation = {
       }
       if (result) {
         return {
-          message: "Product updated successfully.",
+          message: 'Product updated successfully.',
           success: true,
         };
       }
-      return new ApolloError(
-        `The product could not be updated. Please try again.`
-      );
+      return new ApolloError(`The product could not be updated. Please try again.`);
     } catch (error) {
       return error;
     }
