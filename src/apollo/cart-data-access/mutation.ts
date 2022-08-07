@@ -16,7 +16,7 @@ export const Mutation = {
       if (result instanceof ApolloError) {
         return result;
       }
-      if (result) {
+      if (!!result) {
         return {
           message: 'Your cart was saved successfully.',
           success: true,
@@ -42,7 +42,7 @@ export const Mutation = {
       if (result instanceof ApolloError) {
         return result;
       } else {
-        if (result.ok) {
+        if (!!result) {
           return {
             message: 'Successfully updated your cart.',
             success: true,
@@ -57,13 +57,13 @@ export const Mutation = {
   clearCart: async (
     parent: any,
     args: {
-      email: string;
+      userId: string;
     },
     { dataSources }: any
   ) => {
     try {
       const client: CartDatasource = dataSources.cartApi;
-      const result = await client.clearCart(args.email);
+      const result = await client.clearCart(args.userId);
       if (result instanceof ApolloError) {
         return result;
       }
@@ -91,7 +91,7 @@ export const Mutation = {
       if (result instanceof ApolloError) {
         return result;
       }
-      if (result.ok) {
+      if (!!result) {
         return {
           message: 'Successfully updated your cart.',
           success: true,

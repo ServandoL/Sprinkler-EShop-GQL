@@ -72,7 +72,7 @@ export const Mutation = {
       if (result instanceof ApolloError) {
         return result;
       }
-      if (result) {
+      if (!!result && result.ok) {
         return {
           message: 'Product updated successfully.',
           success: true,

@@ -8,13 +8,13 @@ export const CartTypeDefs = gql`
   type Mutation {
     saveCart(request: SaveCartRequest): genericResponse
     addToCart(request: AddToCartInput): genericResponse
-    clearCart(email: String): genericResponse
+    clearCart(userId: String): genericResponse
     updateCart(request: CartInput): genericResponse
   }
 
   input SaveCartRequest {
     cart: [CartInput]
-    email: String
+    userId: String
   }
 
   input UpdateCartQuantity {
@@ -25,7 +25,7 @@ export const CartTypeDefs = gql`
 
   input AddToCartInput {
     _id: String
-    email: String
+    userId: String
     quantity: Int
     productName: String
     price: Float
@@ -37,7 +37,7 @@ export const CartTypeDefs = gql`
 
   input CartInput {
     _id: String
-    email: String
+    userId: String
     productName: String
     price: Float
     category: String

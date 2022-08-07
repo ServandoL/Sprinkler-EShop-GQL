@@ -1,6 +1,6 @@
 export interface CartItem {
   _id: string;
-  email?: string;
+  userId?: string;
   productName: string;
   price: number;
   category: string;
@@ -13,7 +13,7 @@ export interface CartItem {
 export interface Cart {
   _id: string;
   cart: CartItem[];
-  email: string;
+  userId: string;
   createdDate?: string;
   updated?: boolean;
   dateProcessed?: string;
@@ -21,7 +21,7 @@ export interface Cart {
 }
 
 export interface SaveCartRequest {
-  email: string;
+  userId: string;
   cart: CartItem[];
 }
 

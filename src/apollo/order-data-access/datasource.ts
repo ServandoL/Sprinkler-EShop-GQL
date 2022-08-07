@@ -56,7 +56,10 @@ export class OrderDatasource extends DataSource {
   async createOrder(request: Order) {
     const productCollection: Collection<IProduct> = this.db.collection(env.productsCollection);
     const transactionSession: ClientSession = this.client.startSession();
-
+    console.log(
+        this.loc + '.createOrder',
+        `Request: ${JSON.stringify(request)}`
+      );
     try {
       console.log(
         this.loc + '.createOrder',
@@ -104,7 +107,7 @@ export class OrderDatasource extends DataSource {
               )}`
             );
           } else {
-            const filter: Filter<Cart> = { email: request.email };
+            const filter: Filter<Cart> = { userId: request.userId };
             await this.db
               .collection(env.cartCollection)
               .deleteOne(filter, { session: transactionSession });

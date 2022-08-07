@@ -189,6 +189,7 @@ export class ProductDatasource extends DataSource {
   }
 
   async updateProduct(request: UpdateProductRequest) {
+    console.log(this.loc+'.updateProduct', `Request: ${JSON.stringify(request)}`)
     try {
       const filter: Filter<IProduct> = { _id: request.productId };
       const [error, data] = await to(this.collection.findOne(filter));
@@ -198,6 +199,7 @@ export class ProductDatasource extends DataSource {
         );
       } else {
         const { modified, ...product } = data as unknown as IProduct;
+        console.log(modified)
         if (modified) {
           const update: UpdateFilter<IProduct> = {
             $set: {
@@ -207,6 +209,15 @@ export class ProductDatasource extends DataSource {
             },
           };
           return await this.collection.findOneAndUpdate(filter, update);
+        } else {
+          const update: UpdateFilter<IProduct> = {
+            $set: {
+              ...product,
+              ...request,
+              modified: [request]
+            }
+          }
+          return await this.collection.findOneAndUpdate(filter, update)
         }
       }
     } catch (error) {
