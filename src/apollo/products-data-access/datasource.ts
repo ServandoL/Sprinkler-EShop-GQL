@@ -35,7 +35,7 @@ export class ProductDatasource extends DataSource {
     super();
     this.client = client;
     this.db = this.client.db(env.database);
-    this.collection = this.db.collection(env.productsCollection);
+    this.collection = this.db.collection(env.newProducts);
   }
 
   async getProductFilters(request: string[]) {

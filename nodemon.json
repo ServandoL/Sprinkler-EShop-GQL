@@ -8,6 +8,7 @@
     "cartCollection": "cart",
     "ordersCollection": "orders",
     "port": "4000",
-    "introspection": "true"
+    "introspection": "true",
+    "NEW_PRODUCTS": "NEW_PRODUCTS"
   }
 }
