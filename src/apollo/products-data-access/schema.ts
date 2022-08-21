@@ -85,9 +85,17 @@ export const ProductsTypeDef = gql`
     brand: String!
     stock: Int!
     imageUrl: String
+    rating: Float
+    ratings: [Rating]
     isDeleted: Boolean
     deleted_by: String
     deleted_date: String
+  }
+
+  type Rating {
+    name: String
+    review: String
+    rate: Int
   }
 
   input DeleteRequest {

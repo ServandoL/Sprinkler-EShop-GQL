@@ -189,7 +189,7 @@ export class ProductDatasource extends DataSource {
   }
 
   async updateProduct(request: UpdateProductRequest) {
-    console.log(this.loc+'.updateProduct', `Request: ${JSON.stringify(request)}`)
+    console.log(this.loc + '.updateProduct', `Request: ${JSON.stringify(request)}`);
     try {
       const filter: Filter<IProduct> = { _id: request.productId };
       const [error, data] = await to(this.collection.findOne(filter));
@@ -199,7 +199,7 @@ export class ProductDatasource extends DataSource {
         );
       } else {
         const { modified, ...product } = data as unknown as IProduct;
-        console.log(modified)
+        console.log(modified);
         if (modified) {
           const update: UpdateFilter<IProduct> = {
             $set: {
@@ -214,10 +214,10 @@ export class ProductDatasource extends DataSource {
             $set: {
               ...product,
               ...request,
-              modified: [request]
-            }
-          }
-          return await this.collection.findOneAndUpdate(filter, update)
+              modified: [request],
+            },
+          };
+          return await this.collection.findOneAndUpdate(filter, update);
         }
       }
     } catch (error) {
@@ -225,5 +225,14 @@ export class ProductDatasource extends DataSource {
         `An error occurred while trying to update this product. ${JSON.stringify(error)}`
       );
     }
+  }
+
+  protected updateProductRating(product: IProduct) {
+    const reviews = product.ratings?.length ? [...product.ratings] : [];
+    let rating = 0;
+    reviews.forEach((review) => {
+      rating += review.rate;
+    });
+    product.rating = reviews.length > 0 ? rating / reviews.length : 0;
   }
 }
