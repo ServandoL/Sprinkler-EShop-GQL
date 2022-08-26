@@ -69,4 +69,15 @@ export interface Rating {
   name: string;
   review: string;
   rate: number;
+  createdDate: string;
+  headLine: string;
+}
+
+export interface ReviewRequest {
+  productId: string;
+  name: string;
+  review: string;
+  headLine: string;
+  rate: number;
+  createdDate: string;
 }

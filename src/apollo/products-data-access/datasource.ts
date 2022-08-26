@@ -4,7 +4,6 @@ import {
   Collection,
   Db,
   Filter,
-  AggregateOptions,
   Document,
   UpdateFilter,
   ModifyResult,
@@ -16,7 +15,8 @@ import {
   FilterResponse,
   IProduct,
   ProductRequest,
-  ProductResponse,
+  Rating,
+  ReviewRequest,
   UpdateProductRequest,
 } from './models/interfaces';
 import * as env from '../../../config';
@@ -234,5 +234,53 @@ export class ProductDatasource extends DataSource {
       rating += review.rate;
     });
     product.rating = reviews.length > 0 ? rating / reviews.length : 0;
+  }
+
+  async reviewProduct(request: ReviewRequest) {
+    try {
+      const newRating: Rating = {
+        rate: request.rate,
+        review: request.review,
+        createdDate: new Date().toISOString(),
+        name: request.name,
+        headLine: request.headLine,
+      };
+      const filter: Filter<IProduct> = { _id: request.productId };
+      const [error, data] = await to(this.collection.findOne(filter));
+      if (error) {
+        return new ApolloError(
+          `An error occurred while trying to review this product. ${JSON.stringify(error)}`
+        );
+      } else {
+        const { ratings, rating, ...product } = data as unknown as IProduct;
+        if (ratings?.length) {
+          let updatedRating = request.rate;
+          ratings.forEach((rating) => {
+            updatedRating += rating.rate;
+          });
+          const update: UpdateFilter<IProduct> = {
+            $set: {
+              ...product,
+              rating: updatedRating / (ratings.length + 1),
+              ratings: [...ratings, newRating],
+            },
+          };
+          return await this.collection.findOneAndUpdate(filter, update);
+        } else {
+          const update: UpdateFilter<IProduct> = {
+            $set: {
+              ...product,
+              rating: request.rate,
+              ratings: [newRating],
+            },
+          };
+          return await this.collection.findOneAndUpdate(filter, update);
+        }
+      }
+    } catch (error) {
+      return new ApolloError(
+        `An error occurred while trying to review this product. ${JSON.stringify(error)}`
+      );
+    }
   }
 }
