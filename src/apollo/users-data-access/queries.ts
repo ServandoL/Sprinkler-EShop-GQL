@@ -16,7 +16,7 @@ export const Query = {
           user: null,
         };
       }
-      if (!!result) {
+      if (result) {
         return {
           message: 'Successfully found user.',
           success: true,

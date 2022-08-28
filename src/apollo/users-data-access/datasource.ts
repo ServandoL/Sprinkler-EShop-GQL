@@ -26,7 +26,7 @@ export class UserDatasource extends DataSource {
           `An error occurred while retrieving your account. ${JSON.stringify(error)}`
         );
       } else {
-        if (!!data) {
+        if (data) {
           return {
             _id: data._id,
             fname: data.fname,
@@ -48,7 +48,7 @@ export class UserDatasource extends DataSource {
     try {
       const query: Filter<IUser> = { email: user.email };
       const exists = await this.collection.findOne(query);
-      if (!!exists) {
+      if (exists) {
         return new ApolloError(
           `This email is already registered. ${JSON.stringify({
             error: 'User already exists.',
@@ -93,7 +93,7 @@ export class UserDatasource extends DataSource {
             `An error occurred while retrieving your account. Please verify your password.`
           );
         }
-        if (!!request.newPassword) {
+        if (request.newPassword) {
           if (request.newPassword === data.password) {
             return new ApolloError(
               `Your new password cannot be the same as your current password.`
@@ -102,7 +102,7 @@ export class UserDatasource extends DataSource {
             data.password = request.newPassword;
           }
         }
-        if (!!request.email) {
+        if (request.email) {
           if (request.email === data.email) {
             return new ApolloError(`Your new email cannot be the same as your current email.`);
           } else {

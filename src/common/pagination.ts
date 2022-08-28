@@ -5,8 +5,7 @@ import { Page, PaginatedResponse } from '../interfaces/interfaces';
 export async function Paginate(
   collection: Collection<any>,
   aggregate: Document[],
-  pagination: Page,
-  sort?: any
+  pagination: Page
 ) {
   try {
     const skips = pagination.pageSize * (pagination.pageNumber - 1);

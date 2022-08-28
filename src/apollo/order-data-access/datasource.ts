@@ -10,7 +10,6 @@ import {
   MongoClient,
   ObjectId,
   UpdateFilter,
-  UpdateOneModel,
 } from 'mongodb';
 import * as env from '../../../config';
 import { Paginate } from '../../common/pagination';
@@ -56,10 +55,7 @@ export class OrderDatasource extends DataSource {
   async createOrder(request: Order) {
     const productCollection: Collection<IProduct> = this.db.collection(env.productsCollection);
     const transactionSession: ClientSession = this.client.startSession();
-    console.log(
-        this.loc + '.createOrder',
-        `Request: ${JSON.stringify(request)}`
-      );
+    console.log(this.loc + '.createOrder', `Request: ${JSON.stringify(request)}`);
     try {
       console.log(
         this.loc + '.createOrder',

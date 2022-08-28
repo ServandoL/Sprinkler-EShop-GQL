@@ -1,4 +1,3 @@
-import { ApolloError } from 'apollo-server';
 import { OrderDatasource } from './datasource';
 import { OrderHistoryRequest } from './models/interfaces';
 

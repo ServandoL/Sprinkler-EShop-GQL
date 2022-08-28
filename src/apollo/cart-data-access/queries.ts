@@ -9,7 +9,7 @@ export const Query = {
       if (result instanceof ApolloError) {
         return result;
       }
-      if (!!result) {
+      if (result) {
         return {
           cart: result.cart,
           userId: result.userId,

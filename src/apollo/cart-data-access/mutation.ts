@@ -16,7 +16,7 @@ export const Mutation = {
       if (result instanceof ApolloError) {
         return result;
       }
-      if (!!result) {
+      if (result) {
         return {
           message: 'Your cart was saved successfully.',
           success: true,
@@ -42,7 +42,7 @@ export const Mutation = {
       if (result instanceof ApolloError) {
         return result;
       } else {
-        if (!!result) {
+        if (result) {
           return {
             message: 'Successfully updated your cart.',
             success: true,
@@ -91,7 +91,7 @@ export const Mutation = {
       if (result instanceof ApolloError) {
         return result;
       }
-      if (!!result) {
+      if (result) {
         return {
           message: 'Successfully updated your cart.',
           success: true,

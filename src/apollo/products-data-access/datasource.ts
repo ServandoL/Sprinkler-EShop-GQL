@@ -252,7 +252,7 @@ export class ProductDatasource extends DataSource {
           `An error occurred while trying to review this product. ${JSON.stringify(error)}`
         );
       } else {
-        const { ratings, rating, ...product } = data as unknown as IProduct;
+        const { ratings, ...product } = data as unknown as IProduct;
         if (ratings?.length) {
           let updatedRating = request.rate;
           ratings.forEach((rating) => {

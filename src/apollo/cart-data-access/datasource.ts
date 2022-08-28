@@ -46,75 +46,76 @@ export class CartDatasource extends DataSource {
 
   async saveCart(request: SaveCartRequest) {
     const transactionSession: ClientSession = this.client.startSession();
-    console.log(this.loc+'.saveCart', `Request: ${JSON.stringify(request)}`)
+    console.log(this.loc + '.saveCart', `Request: ${JSON.stringify(request)}`);
     try {
       console.log(
         this.loc + '.saveCart',
         `Transaction started. ${JSON.stringify(new Date().toISOString())}`
       );
       const query: Filter<Cart> = { userId: request.userId };
-      const [error, data] = await to(transactionSession.withTransaction(async () => {
-        const [error, data] = await to(
-          this.collection.findOne(query, { session: transactionSession })
-        );
-        if (error) {
-          return new ApolloError(`
+      const [error, data] = await to(
+        transactionSession.withTransaction(async () => {
+          const [error, data] = await to(
+            this.collection.findOne(query, { session: transactionSession })
+          );
+          if (error) {
+            return new ApolloError(`
             An error occurred while trying to save to your cart.`);
-        } else {
-          if (!data) {
-            for (const cartItem of request.cart) {
-              const error = await this.validateQuantityOnHand(cartItem, transactionSession);
-              if (error instanceof ApolloError) {
-                console.log(
-                  this.loc + '.saveCart',
-                  `Error validating quantities for ${JSON.stringify(cartItem)}`
-                );
-                return new ApolloError(error + ` Item: ${cartItem.productName}`);
-              }
-            }
-            const result = await this.collection.insertOne(
-              {
-                userId: request.userId,
-                cart: request.cart,
-                _id: new ObjectId().toString(),
-                createdDate: new Date().toISOString(),
-              },
-              { session: transactionSession }
-            );
-            if (result.acknowledged && result.insertedId) {
-              return true;
-            }
-            return false;
           } else {
-            const toUpdate: CartItem[] = request.cart;
-            for (const product of toUpdate) {
-              const error = await this.validateQuantityOnHand(product, transactionSession);
-              if (error instanceof ApolloError) {
-                return error;
+            if (!data) {
+              for (const cartItem of request.cart) {
+                const error = await this.validateQuantityOnHand(cartItem, transactionSession);
+                if (error instanceof ApolloError) {
+                  console.log(
+                    this.loc + '.saveCart',
+                    `Error validating quantities for ${JSON.stringify(cartItem)}`
+                  );
+                  return new ApolloError(error + ` Item: ${cartItem.productName}`);
+                }
               }
+              const result = await this.collection.insertOne(
+                {
+                  userId: request.userId,
+                  cart: request.cart,
+                  _id: new ObjectId().toString(),
+                  createdDate: new Date().toISOString(),
+                },
+                { session: transactionSession }
+              );
+              if (result.acknowledged && result.insertedId) {
+                return true;
+              }
+              return false;
+            } else {
+              const toUpdate: CartItem[] = request.cart;
+              for (const product of toUpdate) {
+                const error = await this.validateQuantityOnHand(product, transactionSession);
+                if (error instanceof ApolloError) {
+                  return error;
+                }
+              }
+              const update: UpdateFilter<Cart> = {
+                $set: {
+                  ...data,
+                  cart: toUpdate,
+                },
+              };
+              const result = await this.collection.findOneAndUpdate(query, update, {
+                session: transactionSession,
+              });
+              if (result && result.ok) {
+                return true;
+              }
+              return false;
             }
-            const update: UpdateFilter<Cart> = {
-              $set: {
-                ...data,
-                cart: toUpdate,
-              },
-            };
-            const result = await this.collection.findOneAndUpdate(query, update, {
-              session: transactionSession,
-            });
-            if (result && result.ok) {
-              return true;
-            }
-            return false;
           }
-        }
-      }))
+        })
+      );
       if (error) {
-        return new ApolloError(`ERROR: ${JSON.stringify(error)}`)
+        return new ApolloError(`ERROR: ${JSON.stringify(error)}`);
       } else {
         return data;
       }
-      
     } catch (error) {
       return new ApolloError(
         `An error occurred while trying to save to your cart. ${JSON.stringify(error)}`
@@ -223,7 +224,7 @@ export class CartDatasource extends DataSource {
             const exists: CartItem | undefined = cartItems.find(
               (product) => product._id === request._id
             );
-            if (!!exists) {
+            if (exists) {
               return await this.updateCartQuantity(exists);
             }
             cartItems.push(request);
