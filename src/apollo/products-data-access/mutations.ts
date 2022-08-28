@@ -1,6 +1,11 @@
 import { ApolloError } from 'apollo-server';
 import { ProductDatasource } from './datasource';
-import { AddProductRequest, DeleteRequest, UpdateProductRequest } from './models/interfaces';
+import {
+  AddProductRequest,
+  DeleteRequest,
+  ReviewRequest,
+  UpdateProductRequest,
+} from './models/interfaces';
 
 export const Mutation = {
   addProduct: async (
@@ -79,6 +84,30 @@ export const Mutation = {
         };
       }
       return new ApolloError(`The product could not be updated. Please try again.`);
+    } catch (error) {
+      return error;
+    }
+  },
+  reviewProduct: async (
+    parent: any,
+    args: {
+      reviewRequest: ReviewRequest;
+    },
+    { dataSources }: any
+  ) => {
+    try {
+      const client: ProductDatasource = dataSources.productApi;
+      const result = await client.reviewProduct(args.reviewRequest);
+      if (result instanceof ApolloError) {
+        return result;
+      }
+      if (!!result && result.ok) {
+        return {
+          message: 'Product reviewed successfully.',
+          success: true,
+        };
+      }
+      return new ApolloError(`The product could not be reviewed. Please try again.`);
     } catch (error) {
       return error;
     }

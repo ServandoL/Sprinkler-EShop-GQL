@@ -13,6 +13,17 @@ export const ProductsTypeDef = gql`
     deleteProduct(deleteRequest: DeleteRequest): deleteProductResponse
 
     updateProduct(updateRequest: UpdateProductRequest): genericResponse
+
+    reviewProduct(reviewRequest: ReviewRequest): genericResponse
+  }
+
+  input ReviewRequest {
+    productId: ID!
+    name: String
+    review: String
+    headLine: String
+    rate: Int
+    createdDate: String
   }
 
   input FilterInput {
@@ -85,9 +96,19 @@ export const ProductsTypeDef = gql`
     brand: String!
     stock: Int!
     imageUrl: String
+    rating: Float
+    ratings: [Rating]
     isDeleted: Boolean
     deleted_by: String
     deleted_date: String
+  }
+
+  type Rating {
+    name: String
+    review: String
+    rate: Int
+    headLine: String
+    createdDate: String
   }
 
   input DeleteRequest {
