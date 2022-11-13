@@ -1,3 +1,4 @@
+import { Document, ObjectId, WithId } from 'mongodb';
 import { Pagination } from '../../../interfaces/interfaces';
 
 export interface ProductResponse {
@@ -28,8 +29,7 @@ export interface AddProductRequest {
   imageUrl: string;
   createdBy: string;
 }
-export interface IProduct {
-  _id: string;
+export interface IProduct extends WithId<Document> {
   productName: string;
   price: number;
   category: string;
@@ -48,8 +48,7 @@ export interface IProduct {
   modified?: UpdateProductRequest[];
 }
 
-export interface UpdateProductRequest {
-  productId: string;
+export interface UpdateProductRequest extends WithId<Document> {
   modifiedBy: string;
   modifiedDate: string;
   productName: string;
@@ -73,7 +72,7 @@ export interface Rating {
 }
 
 export interface ReviewRequest {
-  productId: string;
+  productId: ObjectId;
   name: string;
   review: string;
   headLine: string;

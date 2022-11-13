@@ -29,7 +29,7 @@ export interface CreditCard {
 }
 
 export interface CartItem {
-  _id: string;
+  _id: ObjectId;
   productName: string;
   price: number;
   category: string;

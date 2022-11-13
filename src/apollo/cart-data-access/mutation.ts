@@ -22,7 +22,7 @@ export const Mutation = {
           success: true,
         };
       }
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while trying to save your cart. You can only have one cart saved at any time.`
       );
     } catch (error) {
@@ -48,7 +48,7 @@ export const Mutation = {
             success: true,
           };
         }
-        return new ApolloError(`There was an error while trying to update your cart.`);
+        throw new ApolloError(`There was an error while trying to update your cart.`);
       }
     } catch (error) {
       return error;
@@ -64,16 +64,13 @@ export const Mutation = {
     try {
       const client: CartDatasource = dataSources.cartApi;
       const result = await client.clearCart(args.userId);
-      if (result instanceof ApolloError) {
-        return result;
-      }
       if (result) {
         return {
           message: 'Successfully cleared your cart.',
           success: true,
         };
       }
-      return new ApolloError(`No items in your cart to delete.`);
+      throw new ApolloError(`No items in your cart to delete.`);
     } catch (error) {
       return error;
     }
@@ -97,7 +94,7 @@ export const Mutation = {
           success: true,
         };
       } else {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while trying to update your cart. Please try again.`
         );
       }

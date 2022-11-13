@@ -1,5 +1,7 @@
+import { ObjectId } from 'mongodb';
+
 export interface IUser {
-  _id: string;
+  _id: ObjectId;
   fname: string;
   lname: string;
   email: string;
@@ -8,10 +10,11 @@ export interface IUser {
   createdDate?: string;
   updatedDate?: string;
   updated?: boolean;
+  deleted?: boolean;
 }
 
 export interface UpdateRequest {
-  _id: string;
+  _id: ObjectId;
   currentPassword: string;
   email?: string;
   newPassword?: string;

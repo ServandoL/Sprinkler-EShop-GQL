@@ -22,23 +22,23 @@ export class UserDatasource extends DataSource {
       const query: Filter<IUser> = { email, password };
       const [error, data] = await to(this.collection.findOne(query));
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while retrieving your account. ${JSON.stringify(error)}`
         );
       } else {
         if (data) {
           return {
-            _id: data._id,
+            _id: data._id.toString(),
             fname: data.fname,
             lname: data.lname,
             email: data.email,
             isAdmin: data.isAdmin,
-          } as IUser;
+          };
         }
         return undefined;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while retrieving your account. ${JSON.stringify(error)}`
       );
     }
@@ -49,7 +49,7 @@ export class UserDatasource extends DataSource {
       const query: Filter<IUser> = { email: user.email };
       const exists = await this.collection.findOne(query);
       if (exists) {
-        return new ApolloError(
+        throw new ApolloError(
           `This email is already registered. ${JSON.stringify({
             error: 'User already exists.',
           })}`
@@ -59,18 +59,18 @@ export class UserDatasource extends DataSource {
         this.collection.insertOne({
           ...user,
           createdDate: new Date().toISOString(),
-          _id: new ObjectId().toString(),
+          _id: new ObjectId(),
         })
       );
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while creating your account. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while creating your account. ${JSON.stringify(error)}`
       );
     }
@@ -79,32 +79,30 @@ export class UserDatasource extends DataSource {
   async updateUser(request: UpdateRequest) {
     try {
       const query: Filter<IUser> = {
-        _id: request._id,
+        _id: new ObjectId(request._id),
         password: request.currentPassword,
       };
       const [error, data] = await to(this.collection.findOne(query));
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while trying to update your account. ${JSON.stringify(error)}`
         );
       } else {
         if (!data) {
-          return new ApolloError(
+          throw new ApolloError(
             `An error occurred while retrieving your account. Please verify your password.`
           );
         }
         if (request.newPassword) {
           if (request.newPassword === data.password) {
-            return new ApolloError(
-              `Your new password cannot be the same as your current password.`
-            );
+            throw new ApolloError(`Your new password cannot be the same as your current password.`);
           } else {
             data.password = request.newPassword;
           }
         }
         if (request.email) {
           if (request.email === data.email) {
-            return new ApolloError(`Your new email cannot be the same as your current email.`);
+            throw new ApolloError(`Your new email cannot be the same as your current email.`);
           } else {
             data.email = request.email;
           }
@@ -116,10 +114,21 @@ export class UserDatasource extends DataSource {
             updated: true,
           },
         };
-        return await this.collection.findOneAndUpdate(query, toUpdate);
+        const updated = await this.collection.findOneAndUpdate(query, toUpdate);
+        if (updated.ok) {
+          return {
+            message: 'Your profile was updated successfully.',
+            success: true,
+          };
+        } else {
+          return {
+            message: 'Your profile could not be updated. Please try again.',
+            success: false,
+          };
+        }
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while trying to update your account. ${JSON.stringify(error)}`
       );
     }
@@ -127,17 +136,18 @@ export class UserDatasource extends DataSource {
 
   async deleteUser(_id: string) {
     try {
-      const query: Filter<IUser> = { _id: _id };
+      const query: Filter<IUser> = { _id: new ObjectId(_id) };
+      console.log(query);
       const [error, data] = await to(this.collection.findOneAndDelete(query));
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while trying to delete your account. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while trying to delete your account. Please try again. ${JSON.stringify(
           error
         )}`

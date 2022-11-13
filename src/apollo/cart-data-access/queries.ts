@@ -1,4 +1,3 @@
-import { ApolloError } from 'apollo-server';
 import { CartDatasource } from './datasource';
 
 export const Query = {
@@ -6,9 +5,6 @@ export const Query = {
     try {
       const client: CartDatasource = dataSources.cartApi;
       const result = await client.getCart(args.userId);
-      if (result instanceof ApolloError) {
-        return result;
-      }
       if (result) {
         return {
           cart: result.cart,

@@ -83,7 +83,7 @@ export const Mutation = {
           success: true,
         };
       }
-      return new ApolloError(`The product could not be updated. Please try again.`);
+      throw new ApolloError(`The product could not be updated. Please try again.`);
     } catch (error) {
       return error;
     }
@@ -107,7 +107,7 @@ export const Mutation = {
           success: true,
         };
       }
-      return new ApolloError(`The product could not be reviewed. Please try again.`);
+      throw new ApolloError(`The product could not be reviewed. Please try again.`);
     } catch (error) {
       return error;
     }

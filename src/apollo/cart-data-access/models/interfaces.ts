@@ -1,5 +1,7 @@
+import { ObjectId } from 'mongodb';
+
 export interface CartItem {
-  _id: string;
+  _id: ObjectId;
   userId?: string;
   productName: string;
   price: number;
@@ -11,7 +13,7 @@ export interface CartItem {
 }
 
 export interface Cart {
-  _id: string;
+  _id: ObjectId;
   cart: CartItem[];
   userId: string;
   createdDate?: string;

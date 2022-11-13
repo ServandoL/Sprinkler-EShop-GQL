@@ -2,7 +2,7 @@ import { gql } from 'apollo-server';
 
 export const CartTypeDefs = gql`
   type Query {
-    getCart(email: String): getCartResponse
+    getCart(userId: String): getCartResponse
   }
 
   type Mutation {

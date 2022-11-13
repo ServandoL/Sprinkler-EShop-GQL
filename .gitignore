@@ -79,3 +79,4 @@ nodemon.json
 dist/
 
 .env
+nodemon.json

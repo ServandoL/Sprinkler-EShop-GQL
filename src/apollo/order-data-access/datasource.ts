@@ -46,14 +46,14 @@ export class OrderDatasource extends DataSource {
     console.log(`${this.loc}.getOrders`, `aggregate: ${JSON.stringify(aggregate)}`);
     const [error, data] = await to(Paginate(this.collection, aggregate, pageOptions));
     if (error) {
-      return new ApolloError(JSON.stringify(error));
+      throw new ApolloError(JSON.stringify(error));
     } else {
       return data;
     }
   }
 
   async createOrder(request: Order) {
-    const productCollection: Collection<IProduct> = this.db.collection(env.productsCollection);
+    const productCollection: Collection<IProduct> = this.db.collection(env.newProducts);
     const transactionSession: ClientSession = this.client.startSession();
     console.log(this.loc + '.createOrder', `Request: ${JSON.stringify(request)}`);
     try {
@@ -65,16 +65,16 @@ export class OrderDatasource extends DataSource {
         transactionSession.withTransaction(async () => {
           for (const order of request.order) {
             const error = await this.validateQuantityOnHand(order, transactionSession);
-            if (error instanceof ApolloError) {
+            if (error !== true) {
               console.log(
                 this.loc + '.saveCart',
                 `Error validating quantities for ${JSON.stringify(order)}`
               );
-              return new ApolloError(error + ` Item: ${order.productName}`);
+              throw new ApolloError(error + ` Item: ${order.productName}`);
             }
           }
           for (const order of request.order) {
-            const filter: Filter<IProduct> = { _id: order._id.toString() };
+            const filter: Filter<IProduct> = { _id: new ObjectId(order._id) };
             const found = await productCollection.findOne(filter, { session: transactionSession });
             if (found?._id) {
               const update: UpdateFilter<IProduct> = {
@@ -97,7 +97,7 @@ export class OrderDatasource extends DataSource {
             this.collection.insertOne(doc, { session: transactionSession })
           );
           if (error) {
-            return new ApolloError(
+            throw new ApolloError(
               `An error occurred while processing your order. Please try again. ${JSON.stringify(
                 error
               )}`
@@ -112,7 +112,7 @@ export class OrderDatasource extends DataSource {
         })
       );
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while processing your order. Please try again. ${JSON.stringify(
             error
           )}`
@@ -121,7 +121,7 @@ export class OrderDatasource extends DataSource {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while processing your order. Please try again. ${JSON.stringify(error)}`
       );
     } finally {
@@ -135,30 +135,28 @@ export class OrderDatasource extends DataSource {
 
   async validateQuantityOnHand(request: CartItem, session: ClientSession) {
     try {
-      const query: Filter<IProduct> = { _id: request._id };
-
       const [error, data] = await to(
-        this.db.collection<IProduct>(env.productsCollection).findOne(query, { session })
+        this.db
+          .collection<IProduct>(env.newProducts)
+          .findOne({ _id: new ObjectId(request._id) }, { session })
       );
 
       if (error) {
-        return new ApolloError(`An error occurred while trying to validate quantities.`);
+        throw new ApolloError(`An error occurred while trying to validate quantities.`);
       } else {
         if (!data) {
-          return new ApolloError(`The product does not exists. ${JSON.stringify(request)}`);
+          throw new ApolloError(`The product does not exists. ${JSON.stringify(request)}`);
         }
         if (request.quantity <= 0) {
-          return new ApolloError(`You cannot have a quantity of 0 or lower.`);
+          throw new ApolloError(`You cannot have a quantity of 0 or lower.`);
         }
         if (request.quantity > data.stock) {
-          return new ApolloError(
-            `Quantity ordered is greater than the available on hand quantity.`
-          );
+          throw new ApolloError(`Quantity ordered is greater than the available on hand quantity.`);
         }
         return true;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while trying to validate quantities. ${JSON.stringify(error)}`
       );
     }

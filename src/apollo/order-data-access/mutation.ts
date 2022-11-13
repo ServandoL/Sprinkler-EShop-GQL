@@ -14,6 +14,7 @@ export const Mutation = {
       const orderApi: OrderDatasource = dataSources.orderApi;
       const result = await orderApi.createOrder(args.request);
       if (!(result instanceof ApolloError)) {
+        console.log(result);
         if (result) {
           return {
             message: 'Successfully processed your order.',

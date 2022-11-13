@@ -36,7 +36,7 @@
 //       );
 //       return paginatedResult;
 //     } catch (error) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occurred while retrieving the products. ${JSON.stringify({
 //           error: error,
 //         })}`
@@ -58,7 +58,7 @@
 //       );
 //       return paginatedResult;
 //     } catch (error) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occurred while retrieving the products. ${JSON.stringify({
 //           error: error,
 //         })}`
@@ -70,7 +70,7 @@
 //     try {
 //       return await this.database.findOne({ email: user_id });
 //     } catch (err) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occurred while retrieving your cart. ${JSON.stringify({
 //           error: err,
 //         })}`
@@ -82,7 +82,7 @@
 //     try {
 //       return await this.database.find({ email: email }).toArray();
 //     } catch (error) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occurred while retrieving your orders. ${JSON.stringify({
 //           error: error,
 //         })}`
@@ -106,7 +106,7 @@
 //         }
 //       );
 //     } catch (error: any) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occured trying to save your cart. ${JSON.stringify({
 //           error: error,
 //         })}`
@@ -125,7 +125,7 @@
 //       }
 //       return this.database.insertOne(product);
 //     } catch (error) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occured trying update your cart. ${JSON.stringify({
 //           error: error,
 //         })}`
@@ -155,7 +155,7 @@
 //         );
 //       }
 //     } catch (error) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occured trying to update your cart. ${JSON.stringify({
 //           error: error,
 //         })}`
@@ -182,14 +182,14 @@
 //             }
 //           );
 //         } else {
-//           return new ApolloError(`Ooops! This product does not exist.`);
+//           throw new ApolloError(`Ooops! This product does not exist.`);
 //         }
 //       }
 //       return await this.database.insertOne({
 //         ...order,
 //       });
 //     } catch (error: any) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occured while processing your order. ${JSON.stringify({
 //           error: error,
 //         })}`
@@ -204,7 +204,7 @@
 //       });
 //     } catch (error) {
 //       console.log(error);
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occured trying clear your cart. ${JSON.stringify({
 //           error: error,
 //         })}`
@@ -216,7 +216,7 @@
 //     try {
 //       return await this.database.findOne({ email: email, password: password });
 //     } catch (error) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occurred fetching the user. ${JSON.stringify({ error })}`
 //       );
 //     }
@@ -251,7 +251,7 @@
 //       const query = { email: email };
 //       return await this.database.deleteOne(query);
 //     } catch (err) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occured deleting this item. ${JSON.stringify({
 //           error: err,
 //         })}`
@@ -269,7 +269,7 @@
 //       };
 //       return await this.database.updateOne(query, deletion);
 //     } catch (err) {
-//       return new ApolloError(
+//       throw new ApolloError(
 //         `An error occured deleting this item. ${JSON.stringify({
 //           error: err,
 //         })}`

@@ -10,14 +10,14 @@ import {
   ObjectId,
 } from 'mongodb';
 import {
-  AddProductRequest,
-  DeleteRequest,
-  FilterResponse,
   IProduct,
+  FilterResponse,
   ProductRequest,
-  Rating,
-  ReviewRequest,
+  DeleteRequest,
+  AddProductRequest,
   UpdateProductRequest,
+  ReviewRequest,
+  Rating,
 } from './models/interfaces';
 import * as env from '../../../config';
 import { ApolloError } from 'apollo-server';
@@ -47,7 +47,7 @@ export class ProductDatasource extends DataSource {
       };
       const [error, data] = await to(this.collection.find().toArray());
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while retrieving the product filters. ${JSON.stringify(error)}`
         );
       } else {
@@ -69,7 +69,7 @@ export class ProductDatasource extends DataSource {
         } as FilterResponse;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while retrieving the products. ${JSON.stringify(error)}`
       );
     }
@@ -95,14 +95,14 @@ export class ProductDatasource extends DataSource {
       const [error, data] = await to(Paginate(this.collection, searchAggregate, pageOptions));
 
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while retrieving the products. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while retrieving the products. ${JSON.stringify(error)}`
       );
     }
@@ -123,14 +123,14 @@ export class ProductDatasource extends DataSource {
       ];
       const [error, data] = await to(Paginate(this.collection, searchAggregate, pageOptions));
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while retrieving the products. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while retrieving the products. ${JSON.stringify(error)}`
       );
     }
@@ -141,7 +141,7 @@ export class ProductDatasource extends DataSource {
   ): Promise<ModifyResult<IProduct> | undefined | ApolloError> {
     try {
       const filter: Filter<IProduct> = {
-        _id: request.product._id.toString(),
+        _id: new ObjectId(request.product._id),
       };
       const update: UpdateFilter<IProduct> = {
         $set: {
@@ -152,14 +152,14 @@ export class ProductDatasource extends DataSource {
       };
       const [error, data] = await to(this.collection.findOneAndUpdate(filter, update));
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while retrieving the products. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while retrieving the products. ${JSON.stringify(error)}`
       );
     }
@@ -171,18 +171,18 @@ export class ProductDatasource extends DataSource {
         this.collection.insertOne({
           ...request,
           createdDate: new Date().toISOString(),
-          _id: new ObjectId().toString(),
+          _id: new ObjectId(),
         })
       );
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `'An error occurred trying to add the product.' ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `'An error occurred trying to add the product.' ${JSON.stringify(error)}`
       );
     }
@@ -191,10 +191,10 @@ export class ProductDatasource extends DataSource {
   async updateProduct(request: UpdateProductRequest) {
     console.log(this.loc + '.updateProduct', `Request: ${JSON.stringify(request)}`);
     try {
-      const filter: Filter<IProduct> = { _id: request.productId };
+      const filter: Filter<IProduct> = { _id: new ObjectId(request.productId) };
       const [error, data] = await to(this.collection.findOne(filter));
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while trying to update this product. ${JSON.stringify(error)}`
         );
       } else {
@@ -221,7 +221,7 @@ export class ProductDatasource extends DataSource {
         }
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while trying to update this product. ${JSON.stringify(error)}`
       );
     }
@@ -245,10 +245,10 @@ export class ProductDatasource extends DataSource {
         name: request.name,
         headLine: request.headLine,
       };
-      const filter: Filter<IProduct> = { _id: request.productId };
+      const filter: Filter<IProduct> = { _id: new ObjectId(request.productId) };
       const [error, data] = await to(this.collection.findOne(filter));
       if (error) {
-        return new ApolloError(
+        throw new ApolloError(
           `An error occurred while trying to review this product. ${JSON.stringify(error)}`
         );
       } else {
@@ -278,7 +278,7 @@ export class ProductDatasource extends DataSource {
         }
       }
     } catch (error) {
-      return new ApolloError(
+      throw new ApolloError(
         `An error occurred while trying to review this product. ${JSON.stringify(error)}`
       );
     }

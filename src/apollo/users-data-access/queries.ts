@@ -23,7 +23,7 @@ export const Query = {
           user: result,
         };
       }
-      return new ApolloError(`An error occurred while trying to retrieve your account.`);
+      throw new ApolloError(`An error occurred while trying to retrieve your account.`);
     } catch (error) {
       return error;
     }
