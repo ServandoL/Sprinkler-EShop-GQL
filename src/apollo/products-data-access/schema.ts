@@ -5,6 +5,7 @@ export const ProductsTypeDef = gql`
     products(productRequest: ProductInput): getProductResponse
     allProducts(productRequest: ProductInput): getProductResponse
     getFilters(filterRequest: FilterInput): getFilterResponse
+    getCurrentProduct(productId: String!): getCurrentProductResponse
   }
 
   type Mutation {
@@ -15,6 +16,10 @@ export const ProductsTypeDef = gql`
     updateProduct(updateRequest: UpdateProductRequest): genericResponse
 
     reviewProduct(reviewRequest: ReviewRequest): genericResponse
+  }
+
+  type getCurrentProductResponse {
+    product: Product
   }
 
   input ReviewRequest {
@@ -60,7 +65,7 @@ export const ProductsTypeDef = gql`
     isDeleted: Boolean
     deleted_by: String
     deleted_date: String
-    page: Page
+    page: Page!
   }
 
   input DeleteProductItem {
@@ -127,8 +132,8 @@ export const ProductsTypeDef = gql`
   }
 
   input Page {
-    pageSize: Int
-    pageNumber: Int
+    pageSize: Int!
+    pageNumber: Int!
   }
 
   type Pagination {

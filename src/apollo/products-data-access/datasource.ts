@@ -283,4 +283,20 @@ export class ProductDatasource extends DataSource {
       );
     }
   }
+
+  async getCurrentProduct(_id: string) {
+    const filter: Filter<IProduct> = { _id: new ObjectId(_id) };
+    try {
+      const [error, data] = await to(this.collection.findOne(filter));
+      if (error) {
+        throw new ApolloError('An error occurred trying to fetch the product.');
+      } else {
+        return {
+          product: data,
+        };
+      }
+    } catch (error) {
+      throw new ApolloError('An error occured trying to fetch the product.');
+    }
+  }
 }

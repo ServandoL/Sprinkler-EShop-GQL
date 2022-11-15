@@ -2,6 +2,20 @@ import { ProductDatasource } from './datasource';
 import { ProductRequest } from './models/interfaces';
 
 export const Query = {
+  getCurrentProduct: async (
+    parent: any,
+    args: {
+      productId: string;
+    },
+    { dataSources }: any
+  ) => {
+    try {
+      const client: ProductDatasource = dataSources.productApi;
+      return await client.getCurrentProduct(args.productId);
+    } catch (error) {
+      return error;
+    }
+  },
   products: async (
     parent: any,
     args: {

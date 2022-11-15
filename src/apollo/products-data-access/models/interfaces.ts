@@ -29,7 +29,8 @@ export interface AddProductRequest {
   imageUrl: string;
   createdBy: string;
 }
-export interface IProduct extends WithId<Document> {
+export interface IProduct {
+  _id: string | ObjectId;
   productName: string;
   price: number;
   category: string;
