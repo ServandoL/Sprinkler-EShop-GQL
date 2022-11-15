@@ -29,8 +29,7 @@ export interface AddProductRequest {
   imageUrl: string;
   createdBy: string;
 }
-export interface IProduct {
-  _id: string | ObjectId;
+export interface IProduct extends WithId<Document> {
   productName: string;
   price: number;
   category: string;
@@ -79,4 +78,8 @@ export interface ReviewRequest {
   headLine: string;
   rate: number;
   createdDate: string;
+}
+
+export interface CurrentProduct {
+  product: IProduct;
 }

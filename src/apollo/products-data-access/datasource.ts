@@ -18,6 +18,7 @@ import {
   UpdateProductRequest,
   ReviewRequest,
   Rating,
+  CurrentProduct,
 } from './models/interfaces';
 import * as env from '../../../config';
 import { ApolloError } from 'apollo-server';
@@ -284,16 +285,14 @@ export class ProductDatasource extends DataSource {
     }
   }
 
-  async getCurrentProduct(_id: string) {
+  async getCurrentProduct(_id: string): Promise<CurrentProduct | null> {
     const filter: Filter<IProduct> = { _id: new ObjectId(_id) };
     try {
       const [error, data] = await to(this.collection.findOne(filter));
       if (error) {
         throw new ApolloError('An error occurred trying to fetch the product.');
       } else {
-        return {
-          product: data,
-        };
+        return data ? { product: data } : null;
       }
     } catch (error) {
       throw new ApolloError('An error occured trying to fetch the product.');
