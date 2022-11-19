@@ -266,7 +266,17 @@ export class ProductDatasource extends DataSource {
               ratings: [...ratings, newRating],
             },
           };
-          return await this.collection.findOneAndUpdate(filter, update);
+          const result = await this.collection.findOneAndUpdate(filter, update);
+          if (result.ok) {
+            const product = await this.collection.findOne(filter);
+            return {
+              message: 'Product reviewed successfully.',
+              success: true,
+              product: product,
+            };
+          } else {
+            throw new ApolloError('An error occurred while updating your product.');
+          }
         } else {
           const update: UpdateFilter<IProduct> = {
             $set: {
@@ -275,7 +285,17 @@ export class ProductDatasource extends DataSource {
               ratings: [newRating],
             },
           };
-          return await this.collection.findOneAndUpdate(filter, update);
+          const result = await this.collection.findOneAndUpdate(filter, update);
+          if (result.ok) {
+            const product = await this.collection.findOne(filter);
+            return {
+              message: 'Product reviewed successfully.',
+              success: true,
+              product: product,
+            };
+          } else {
+            throw new ApolloError('An error occurred while updating your product.');
+          }
         }
       }
     } catch (error) {

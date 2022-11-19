@@ -15,7 +15,7 @@ export const ProductsTypeDef = gql`
 
     updateProduct(updateRequest: UpdateProductRequest): genericResponse
 
-    reviewProduct(reviewRequest: ReviewRequest): genericResponse
+    reviewProduct(reviewRequest: ReviewRequest): ReviewProductResponse
   }
 
   type getCurrentProductResponse {
@@ -54,6 +54,12 @@ export const ProductsTypeDef = gql`
   type genericResponse {
     message: String
     success: Boolean
+  }
+
+  type ReviewProductResponse {
+    message: String
+    success: Boolean
+    product: Product
   }
 
   input ProductInput {

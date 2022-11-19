@@ -97,17 +97,7 @@ export const Mutation = {
   ) => {
     try {
       const client: ProductDatasource = dataSources.productApi;
-      const result = await client.reviewProduct(args.reviewRequest);
-      if (result instanceof ApolloError) {
-        return result;
-      }
-      if (!!result && result.ok) {
-        return {
-          message: 'Product reviewed successfully.',
-          success: true,
-        };
-      }
-      throw new ApolloError(`The product could not be reviewed. Please try again.`);
+      return await client.reviewProduct(args.reviewRequest);
     } catch (error) {
       return error;
     }
