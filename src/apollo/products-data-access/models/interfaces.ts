@@ -1,6 +1,18 @@
 import { Document, ObjectId, WithId } from 'mongodb';
 import { Pagination } from '../../../interfaces/interfaces';
 
+export interface FindProductRequest {
+  brand: string[];
+  categories: string[];
+  priceRange: number[];
+  search: string;
+  rating: number;
+  page: {
+    pageNumber: number;
+    pageSize: number;
+  };
+}
+
 export interface ProductResponse {
   data: IProduct[];
   pagination: Pagination;

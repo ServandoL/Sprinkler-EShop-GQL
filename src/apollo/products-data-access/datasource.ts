@@ -19,11 +19,12 @@ import {
   ReviewRequest,
   Rating,
   CurrentProduct,
+  FindProductRequest,
 } from './models/interfaces';
 import * as env from '../../../config';
 import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
-import { BRAND, CATEGORY } from './constants';
+import { BRAND, CATEGORIES, CATEGORY, PRICE_RANGE, RATING, SEARCH } from './constants';
 import { Page, PaginatedResponse } from '../../interfaces/interfaces';
 import { Paginate } from '../../common/pagination';
 
@@ -315,6 +316,56 @@ export class ProductDatasource extends DataSource {
         throw new ApolloError('An error occurred trying to fetch the product.');
       } else {
         return data ? { product: data } : null;
+      }
+    } catch (error) {
+      throw new ApolloError('An error occured trying to fetch the product.');
+    }
+  }
+
+  async getFilteredProducts(request: FindProductRequest) {
+    const filter: Filter<Partial<IProduct>> = {};
+    const pageOptions: Page = {
+      pageNumber: request.page.pageNumber,
+      pageSize: request.page.pageSize,
+    };
+    for (const [k, v] of Object.entries(request)) {
+      if (k === CATEGORIES) {
+        if (request.categories.length === 1) {
+          filter.category = v[0];
+        }
+        if (request.categories.length > 1) {
+          filter.category = { $in: v };
+        }
+      }
+      if (k === BRAND) {
+        if (request.brand.length === 1) {
+          filter.brand = v[0];
+        }
+        if (request.brand.length > 1) {
+          filter.brand = { $in: v };
+        }
+      }
+      if (k === PRICE_RANGE) {
+        if (request.priceRange.length) {
+          filter.price = { $gte: v[0], $lte: v[1] };
+        }
+      }
+      if (k === SEARCH) {
+        filter.productName = v;
+      }
+      if (k === RATING) {
+        filter.rating = { $gte: v, $lt: v + 1 };
+      }
+    }
+    console.log('FilteredProducts: Generated query: ', filter);
+    try {
+      const [error, data] = await to(Paginate(this.collection, [{ $match: filter }], pageOptions));
+      if (error) {
+        throw new ApolloError(
+          `An error occurred while retrieving the products. ${JSON.stringify(error)}`
+        );
+      } else {
+        return data;
       }
     } catch (error) {
       throw new ApolloError('An error occured trying to fetch the product.');

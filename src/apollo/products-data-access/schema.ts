@@ -6,6 +6,7 @@ export const ProductsTypeDef = gql`
     allProducts(productRequest: ProductInput): getProductResponse
     getFilters(filterRequest: FilterInput): getFilterResponse
     getCurrentProduct(productId: String!): getCurrentProductResponse
+    findProducts(filterRequest: FindProductInput): getProductResponse
   }
 
   type Mutation {
@@ -20,6 +21,15 @@ export const ProductsTypeDef = gql`
 
   type getCurrentProductResponse {
     product: Product
+  }
+
+  input FindProductInput {
+    brand: [String]
+    categories: [String]
+    priceRange: [Int]
+    rating: Int
+    search: String
+    page: Page!
   }
 
   input ReviewRequest {

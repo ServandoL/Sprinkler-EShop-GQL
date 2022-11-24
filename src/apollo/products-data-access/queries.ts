@@ -1,5 +1,5 @@
 import { ProductDatasource } from './datasource';
-import { ProductRequest } from './models/interfaces';
+import { FindProductRequest, ProductRequest } from './models/interfaces';
 
 export const Query = {
   getCurrentProduct: async (
@@ -56,6 +56,20 @@ export const Query = {
     try {
       const client: ProductDatasource = dataSources.productApi;
       return await client.getProductFilters(args.filterRequest.filters);
+    } catch (error) {
+      return error;
+    }
+  },
+  findProducts: async (
+    parent: any,
+    args: {
+      filterRequest: FindProductRequest;
+    },
+    { dataSources }: any
+  ) => {
+    try {
+      const client: ProductDatasource = dataSources.productApi;
+      return await client.getFilteredProducts(args.filterRequest);
     } catch (error) {
       return error;
     }
