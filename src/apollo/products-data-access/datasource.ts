@@ -351,7 +351,7 @@ export class ProductDatasource extends DataSource {
         }
       }
       if (k === SEARCH) {
-        filter.productName = v;
+        filter['$text'] = { $search: v };
       }
       if (k === RATING) {
         filter.rating = { $gte: v, $lt: v + 1 };
