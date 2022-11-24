@@ -171,6 +171,8 @@ export class ProductDatasource extends DataSource {
       const [error, data] = await to(
         this.collection.insertOne({
           ...request,
+          rating: 0,
+          ratings: [],
           createdDate: new Date().toISOString(),
           _id: new ObjectId(),
         })
