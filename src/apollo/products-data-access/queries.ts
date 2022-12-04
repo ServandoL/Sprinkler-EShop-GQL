@@ -68,6 +68,7 @@ export const Query = {
     { dataSources }: any
   ) => {
     try {
+      console.log(args);
       const client: ProductDatasource = dataSources.productApi;
       return await client.getFilteredProducts(args.filterRequest);
     } catch (error) {

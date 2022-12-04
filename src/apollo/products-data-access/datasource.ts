@@ -323,6 +323,7 @@ export class ProductDatasource extends DataSource {
   }
 
   async getFilteredProducts(request: FindProductRequest) {
+    console.log(request);
     const filter: Filter<Partial<IProduct>> = {};
     const pageOptions: Page = {
       pageNumber: request.page.pageNumber,
@@ -347,14 +348,23 @@ export class ProductDatasource extends DataSource {
       }
       if (k === PRICE_RANGE) {
         if (request.priceRange.length) {
-          filter.price = { $gte: v[0], $lte: v[1] };
+          if (v[0] && v[1]) {
+            filter.price = { $gte: v[0], $lte: v[1] };
+          }
+          if (!v[0] && v[1]) {
+            filter.price = { $gte: v[1] };
+          }
         }
       }
       if (k === SEARCH) {
-        filter['$text'] = { $search: v };
+        if (v) {
+          filter['$text'] = { $search: v };
+        }
       }
       if (k === RATING) {
-        filter.rating = { $gte: v, $lt: v + 1 };
+        if (v) {
+          filter.rating = { $gte: v, $lt: v + 1 };
+        }
       }
     }
     console.log('FilteredProducts: Generated query: ', filter);
@@ -365,6 +375,7 @@ export class ProductDatasource extends DataSource {
           `An error occurred while retrieving the products. ${JSON.stringify(error)}`
         );
       } else {
+        console.log('results', data);
         return data;
       }
     } catch (error) {
