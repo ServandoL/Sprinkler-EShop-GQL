@@ -352,7 +352,7 @@ export class ProductDatasource extends DataSource {
             filter.price = { $gte: v[0], $lte: v[1] };
           }
           if (!v[0] && v[1]) {
-            filter.price = { $gte: v[1] };
+            filter.price = { $lte: v[1] };
           }
         }
       }
