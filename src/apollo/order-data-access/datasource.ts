@@ -16,11 +16,12 @@ import { Paginate } from '../../common/pagination';
 import { Page } from '../../interfaces/interfaces';
 import { Cart } from '../cart-data-access/models/interfaces';
 import { IProduct } from '../products-data-access/models/interfaces';
-import { CartItem, Order, OrderHistoryRequest } from './models/interfaces';
+import { CartItem, Order, OrderHistoryRequest, SPCOrders } from './models/interfaces';
 
 export class OrderDatasource extends DataSource {
   client!: MongoClient;
   collection!: Collection<Order>;
+  spcOrdersCollection!: Collection<SPCOrders>;
   db!: Db;
   loc = 'OrderDatasource';
   constructor(client: MongoClient) {
@@ -28,6 +29,9 @@ export class OrderDatasource extends DataSource {
     this.client = client;
     this.db = this.client.db(env.database);
     this.collection = this.db.collection(env.ordersCollection);
+    this.spcOrdersCollection = this.client
+      .db(env.spcDatabase)
+      .collection<SPCOrders>(env.spcOrdersCollection);
   }
 
   async getOrders(request: OrderHistoryRequest) {
@@ -107,6 +111,21 @@ export class OrderDatasource extends DataSource {
             await this.db
               .collection(env.cartCollection)
               .deleteOne(filter, { session: transactionSession });
+            const insertOrders = request.order.map((order) => {
+              const toInsert: SPCOrders = {
+                brand: order.brand,
+                price: order.price,
+                category: order.category,
+                imageUrl: order.imageUrl,
+                isDeleted: false,
+                dateOrdered: new Date(),
+                productName: order.productName,
+                orderedQuantity: order.quantity,
+                _id: new ObjectId(),
+              };
+              return toInsert;
+            });
+            await this.spcOrdersCollection.insertMany(insertOrders);
             return data;
           }
         })

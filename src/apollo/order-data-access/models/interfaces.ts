@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { Document, ObjectId, WithId } from 'mongodb';
 import { Pagination } from '../../../interfaces/interfaces';
 
 export interface Order {
@@ -50,4 +50,15 @@ export interface OrderHistoryRequest {
 export interface OrderHistoryResponse {
   data: Order[];
   pagination: Pagination;
+}
+
+export interface SPCOrders extends WithId<Document> {
+  brand: string;
+  price: number;
+  category: string;
+  imageUrl: string | undefined;
+  isDeleted: boolean;
+  dateOrdered: Date;
+  productName: string;
+  orderedQuantity: number;
 }

@@ -7,3 +7,5 @@ export const ordersCollection = process.env.ordersCollection || '';
 export const port = process.env.port || 4000;
 export const introspection = process.env.introspection || false;
 export const newProducts = process.env.NEW_PRODUCTS || '';
+export const spcOrdersCollection = process.env.spcOrdersColn || '';
+export const spcDatabase = process.env.spcDatabase || ""
