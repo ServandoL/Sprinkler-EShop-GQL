@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-server';
+import { GraphQLError } from 'graphql';
 import { ProductDatasource } from './datasource';
 import {
   AddProductRequest,
@@ -19,7 +19,7 @@ export const Mutation = {
     try {
       const client: ProductDatasource = dataSources.productApi;
       const result = await client.createProduct(args.addProductRequest);
-      if (result instanceof ApolloError) {
+      if (result instanceof GraphQLError) {
         return result;
       }
       if (result?.acknowledged && result?.insertedId) {
@@ -47,7 +47,7 @@ export const Mutation = {
     try {
       const client: ProductDatasource = dataSources.productApi;
       const result = await client.softDeleteProduct(args.deleteRequest);
-      if (result instanceof ApolloError) {
+      if (result instanceof GraphQLError) {
         return result;
       }
       if (result && result.ok) {
@@ -74,7 +74,7 @@ export const Mutation = {
     try {
       const client: ProductDatasource = dataSources.productApi;
       const result = await client.updateProduct(args.updateRequest);
-      if (result instanceof ApolloError) {
+      if (result instanceof GraphQLError) {
         return result;
       }
       if (!!result && result.ok) {
@@ -83,7 +83,7 @@ export const Mutation = {
           success: true,
         };
       }
-      throw new ApolloError(`The product could not be updated. Please try again.`);
+      throw new GraphQLError(`The product could not be updated. Please try again.`);
     } catch (error) {
       return error;
     }

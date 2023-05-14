@@ -1,4 +1,3 @@
-import { DataSource } from 'apollo-datasource';
 import { Cart, CartItem, SaveCartRequest } from './models/interfaces';
 import {
   MongoClient,
@@ -11,16 +10,15 @@ import {
 } from 'mongodb';
 import * as env from '../../../config';
 import to from 'await-to-js';
-import { ApolloError } from 'apollo-server';
 import { IProduct } from '../products-data-access/models/interfaces';
+import { GraphQLError } from 'graphql';
 
-export class CartDatasource extends DataSource {
+export class CartDatasource {
   client!: MongoClient;
   collection!: Collection<Cart>;
   db!: Db;
   loc = 'CartDatasource';
   constructor(client: MongoClient) {
-    super();
     this.client = client;
     this.db = this.client.db(env.database);
     this.collection = this.db.collection(env.cartCollection);
@@ -31,14 +29,14 @@ export class CartDatasource extends DataSource {
     try {
       const [error, data] = await to(this.collection.findOne(query));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while retrieving your cart. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while retrieving your cart. ${JSON.stringify(error)}`
       );
     }
@@ -59,7 +57,7 @@ export class CartDatasource extends DataSource {
             this.collection.findOne(query, { session: transactionSession })
           );
           if (error) {
-            throw new ApolloError(`
+            throw new GraphQLError(`
             An error occurred while trying to save to your cart.`);
           } else {
             if (!data) {
@@ -70,7 +68,7 @@ export class CartDatasource extends DataSource {
                     this.loc + '.saveCart',
                     `Error validating quantities for ${JSON.stringify(cartItem)}`
                   );
-                  throw new ApolloError(error + ` Item: ${cartItem.productName}`);
+                  throw new GraphQLError(error + ` Item: ${cartItem.productName}`);
                 }
               }
               const result = await this.collection.insertOne(
@@ -112,12 +110,12 @@ export class CartDatasource extends DataSource {
         })
       );
       if (error) {
-        throw new ApolloError(`ERROR: ${JSON.stringify(error)}`);
+        throw new GraphQLError(`ERROR: ${JSON.stringify(error)}`);
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to save to your cart. ${JSON.stringify(error)}`
       );
     } finally {
@@ -138,7 +136,7 @@ export class CartDatasource extends DataSource {
       }
       return false;
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to delete your cart. ${JSON.stringify(error)}`
       );
     }
@@ -160,7 +158,7 @@ export class CartDatasource extends DataSource {
           }
           const [error, data] = await to(this.collection.findOne(query, { session }));
           if (error) {
-            throw new ApolloError(
+            throw new GraphQLError(
               `An error occurred while trying to update your cart. ${JSON.stringify(error)}`
             );
           } else {
@@ -183,12 +181,12 @@ export class CartDatasource extends DataSource {
         })
       );
       if (error) {
-        throw new ApolloError(`ERROR: ${JSON.stringify(error)}`);
+        throw new GraphQLError(`ERROR: ${JSON.stringify(error)}`);
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to update your cart. ${JSON.stringify(error)}`
       );
     } finally {
@@ -216,7 +214,7 @@ export class CartDatasource extends DataSource {
           const query: Filter<Cart> = { userId: request.userId };
           const [error, data] = await to(this.collection.findOne(query));
           if (error) {
-            throw new ApolloError(
+            throw new GraphQLError(
               `An error ocurred while trying to add to your cart. ${JSON.stringify(error)}`
             );
           } else {
@@ -240,12 +238,12 @@ export class CartDatasource extends DataSource {
         })
       );
       if (error) {
-        throw new ApolloError(`ERROR: ${JSON.stringify(error)}`);
+        throw new GraphQLError(`ERROR: ${JSON.stringify(error)}`);
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to add to your cart. ${JSON.stringify(error)}`
       );
     } finally {
@@ -264,21 +262,23 @@ export class CartDatasource extends DataSource {
         this.db.collection<IProduct>(env.newProducts).findOne(query, { session })
       );
       if (error) {
-        throw new ApolloError(`An error occurred while trying to validate quantities.`);
+        throw new GraphQLError(`An error occurred while trying to validate quantities.`);
       } else {
         if (!data) {
-          throw new ApolloError(`The product does not exists. ${JSON.stringify(request)}`);
+          throw new GraphQLError(`The product does not exists. ${JSON.stringify(request)}`);
         }
         if (request.quantity <= 0) {
-          throw new ApolloError(`You cannot have a quantity of 0 or lower.`);
+          throw new GraphQLError(`You cannot have a quantity of 0 or lower.`);
         }
         if (request.quantity > data.stock) {
-          throw new ApolloError(`Quantity ordered is greater than the available on hand quantity.`);
+          throw new GraphQLError(
+            `Quantity ordered is greater than the available on hand quantity.`
+          );
         }
         return true;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to validate quantities. ${JSON.stringify(error)}`
       );
     }

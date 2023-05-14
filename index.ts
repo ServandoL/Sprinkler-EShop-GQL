@@ -1,4 +1,3 @@
-import { ApolloServer } from 'apollo-server';
 import { MongoClient } from 'mongodb';
 import * as env from './config';
 import { CartDatasource } from './src/apollo/cart-data-access/datasource';
@@ -13,36 +12,38 @@ import { ProductsTypeDef } from './src/apollo/products-data-access/schema';
 import { UserDatasource } from './src/apollo/users-data-access/datasource';
 import { UserResolvers } from './src/apollo/users-data-access/resolvers';
 import { UserTypeDefs } from './src/apollo/users-data-access/schema';
+import { AppContext } from './src/interfaces/interfaces';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import { ApolloServer, ApolloServerOptions } from '@apollo/server';
 
 const client: MongoClient = new MongoClient(env.connectionString);
 
 async function main() {
-  const port = env.port;
-  const mongoClient = await client.connect();
-  if (mongoClient) {
-    const datasources = () => ({
-      orderApi: new OrderDatasource(mongoClient),
-      productApi: new ProductDatasource(mongoClient),
-      cartApi: new CartDatasource(mongoClient),
-      userApi: new UserDatasource(mongoClient),
-    });
-    const server = new ApolloServer({
+  try {
+    await client.connect();
+    const config: ApolloServerOptions<AppContext> = {
       typeDefs: [OrderTypeDefs, ProductsTypeDef, CartTypeDefs, UserTypeDefs],
-      resolvers: [
-        OrderResolvers,
-        ProductResolvers,
-        CartResolvers,
-        UserResolvers,
-      ],
-      dataSources: datasources,
-      introspection: env.introspection === 'true' ? true : false,
+      resolvers: [OrderResolvers, ProductResolvers, CartResolvers, UserResolvers],
+      introspection: env.introspection === 'true',
+    };
+    const server = new ApolloServer(config);
+    const { url } = await startStandaloneServer<AppContext>(server, {
+      context: async () => {
+        const dataSources = {
+          orderApi: new OrderDatasource(client),
+          productApi: new ProductDatasource(client),
+          cartApi: new CartDatasource(client),
+          userApi: new UserDatasource(client),
+        };
+        return {
+          dataSources,
+        };
+      },
+      listen: { port: +env.port },
     });
-
-    server.listen({ port: port }).then(({ url }) => {
-      console.log(`index:`, `Apollo server listening on ${url}`);
-    });
-  } else {
-    console.log('index', 'There was an error connecting to Mongo.');
+    console.log('index', `Apollo Server listening on ${url}`);
+  } catch (error) {
+    console.log('index', `There was an error connecting to Mongo: ${JSON.stringify(error)}`);
   }
 }
 

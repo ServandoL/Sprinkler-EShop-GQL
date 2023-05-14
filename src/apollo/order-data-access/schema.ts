@@ -1,6 +1,4 @@
-import { gql } from 'apollo-server';
-
-export const OrderTypeDefs = gql`
+export const OrderTypeDefs = `#graphql
   type Query {
     orders(orderHistoryRequest: OrderHistoryRequest): getOrderResponse
   }

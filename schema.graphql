@@ -1,0 +1,314 @@
+input AddProductRequest {
+  brand: String!
+  category: String!
+  createdBy: String!
+  imageUrl: String
+  price: Float!
+  productName: String!
+  stock: Int!
+}
+
+input AddToCartInput {
+  _id: String
+  brand: String
+  category: String
+  imageUrl: String
+  price: Float
+  productName: String
+  quantity: Int
+  stock: Int
+  userId: String
+}
+
+input AddUserInput {
+  email: String
+  fname: String
+  isAdmin: Boolean
+  lname: String
+  password: String
+}
+
+type Cart {
+  _id: ID
+  brand: String
+  category: String
+  email: String
+  imageUrl: String
+  price: Float
+  productName: String
+  quantity: Int
+  stock: Int
+}
+
+input CartInput {
+  _id: String
+  brand: String
+  category: String
+  email: String
+  imageUrl: String
+  price: Float
+  productName: String
+  quantity: Int
+  stock: Int
+  userId: String
+}
+
+input DeleteProductItem {
+  _id: ID!
+  brand: String
+  category: String
+  imageUrl: String
+  price: Float
+  productName: String
+  stock: Int
+}
+
+input DeleteRequest {
+  email: String
+  product: DeleteProductItem
+}
+
+input FilterInput {
+  filters: [String]
+}
+
+input FindProductInput {
+  brand: [String]
+  categories: [String]
+  page: Page!
+  priceRange: [Int]
+  rating: Int
+  search: String
+}
+
+type Mutation {
+  addProduct(addProductRequest: AddProductRequest): addProductResponse
+  addToCart(request: AddToCartInput): genericResponse
+  addUser(request: AddUserInput): genericResponse
+  clearCart(userId: String): genericResponse
+  createOrder(request: OrderInput): genericResponse
+  deleteProduct(deleteRequest: DeleteRequest): deleteProductResponse
+  deleteUser(_id: String): genericResponse
+  reviewProduct(reviewRequest: ReviewRequest): ReviewProductResponse
+  saveCart(request: SaveCartRequest): genericResponse
+  updateCart(request: CartInput): genericResponse
+  updateProduct(updateRequest: UpdateProductRequest): genericResponse
+  updateUserInformation(request: UpdateUserInput): genericResponse
+}
+
+input OrderHistoryRequest {
+  page: Page
+  userId: String
+}
+
+input OrderInput {
+  email: String
+  order: [CartInput]
+  payment: PaymentInput
+  shipping: ShippingInput
+  total: Float
+  userId: String
+}
+
+type OrderType {
+  _id: ID
+  email: String
+  order: [Cart]
+  orderId: String
+  orderedDate: String
+  payment: PaymentType
+  shipping: ShippingType
+  total: Float
+}
+
+input Page {
+  pageNumber: Int!
+  pageSize: Int!
+}
+
+type Pagination {
+  hasNextPage: Boolean
+  hasPrevPage: Boolean
+  limit: Int
+  nextPage: Int
+  offset: Int
+  page: Int
+  pagingCounter: Int
+  prevPage: Int
+  totalDocs: Int
+  totalPages: Int
+}
+
+input PaymentInput {
+  cardNumber: String
+  cvv: String
+  month: String
+  year: String
+}
+
+type PaymentType {
+  cardNumber: String
+  cvv: String
+  month: String
+  year: String
+}
+
+type Product {
+  _id: ID
+  brand: String!
+  category: String!
+  deleted_by: String
+  deleted_date: String
+  imageUrl: String
+  isDeleted: Boolean
+  price: Float!
+  productName: String!
+  rating: Float
+  ratings: [Rating]
+  stock: Int!
+}
+
+input ProductInput {
+  brand: String
+  category: String
+  deleted_by: String
+  deleted_date: String
+  isDeleted: Boolean
+  page: Page!
+  price: Float
+  productName: String
+  stock: Int
+}
+
+type Query {
+  allProducts(productRequest: ProductInput): getProductResponse
+  findProducts(filterRequest: FindProductInput): getProductResponse
+  getCart(userId: String): getCartResponse
+  getCurrentProduct(productId: String!): getCurrentProductResponse
+  getFilters(filterRequest: FilterInput): getFilterResponse
+  getUser(email: String, password: String): getUserResponse
+  orders(orderHistoryRequest: OrderHistoryRequest): getOrderResponse
+  products(productRequest: ProductInput): getProductResponse
+}
+
+type Rating {
+  createdDate: String
+  headLine: String
+  name: String
+  rate: Int
+  review: String
+}
+
+type ReviewProductResponse {
+  message: String
+  product: Product
+  success: Boolean
+}
+
+input ReviewRequest {
+  createdDate: String
+  headLine: String
+  name: String
+  productId: ID!
+  rate: Int
+  review: String
+}
+
+input SaveCartRequest {
+  cart: [CartInput]
+  userId: String
+}
+
+input ShippingInput {
+  address: String
+  address2: String
+  city: String
+  state: String
+  zipCode: String
+}
+
+type ShippingType {
+  address: String
+  address2: String
+  city: String
+  state: String
+  zipCode: String
+}
+
+input UpdateCartQuantity {
+  _id: ID
+  email: String
+  quantity: Int
+}
+
+input UpdateProductRequest {
+  imageUrl: String
+  modifiedBy: String
+  modifiedDate: String
+  price: Float
+  productId: ID
+  productName: String
+  stock: Int
+}
+
+input UpdateUserInput {
+  _id: String!
+  currentPassword: String!
+  email: String
+  newPassword: String
+}
+
+type User {
+  _id: ID
+  email: String
+  fname: String
+  isAdmin: Boolean
+  lname: String
+  password: String
+}
+
+type addProductResponse {
+  message: String
+  success: Boolean
+}
+
+type deleteProductResponse {
+  message: String
+  success: Boolean
+}
+
+type genericResponse {
+  message: String
+  success: Boolean
+}
+
+type getCartResponse {
+  cart: [Cart]
+  email: String
+}
+
+type getCurrentProductResponse {
+  product: Product
+}
+
+type getFilterResponse {
+  brands: [String]
+  categories: [String]
+  success: Boolean
+}
+
+type getOrderResponse {
+  data: [OrderType]
+  pagination: Pagination
+}
+
+type getProductResponse {
+  data: [Product]
+  pagination: Pagination
+}
+
+type getUserResponse {
+  message: String
+  success: Boolean
+  user: User
+}

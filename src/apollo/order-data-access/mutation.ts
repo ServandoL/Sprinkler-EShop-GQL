@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-server';
+import { GraphQLError } from 'graphql';
 import { OrderDatasource } from './datasource';
 import { Order } from './models/interfaces';
 
@@ -13,7 +13,7 @@ export const Mutation = {
     try {
       const orderApi: OrderDatasource = dataSources.orderApi;
       const result = await orderApi.createOrder(args.request);
-      if (!(result instanceof ApolloError)) {
+      if (!(result instanceof GraphQLError)) {
         console.log(result);
         if (result) {
           return {

@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-server';
+import { GraphQLError } from 'graphql';
 import { UserDatasource } from './datasource';
 
 export const Query = {
@@ -6,7 +6,7 @@ export const Query = {
     try {
       const client: UserDatasource = dataSources.userApi;
       const result = await client.getUser(args.email, args.password);
-      if (result instanceof ApolloError) {
+      if (result instanceof GraphQLError) {
         return result;
       }
       if (!result) {
@@ -23,7 +23,7 @@ export const Query = {
           user: result,
         };
       }
-      throw new ApolloError(`An error occurred while trying to retrieve your account.`);
+      throw new GraphQLError(`An error occurred while trying to retrieve your account.`);
     } catch (error) {
       return error;
     }

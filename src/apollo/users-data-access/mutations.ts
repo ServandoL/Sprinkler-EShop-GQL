@@ -1,4 +1,4 @@
-import { ApolloError } from 'apollo-server';
+import { GraphQLError } from 'graphql';
 import { UserDatasource } from './datasource';
 import { IUser, UpdateRequest } from './models/interfaces';
 
@@ -8,7 +8,7 @@ export const Mutation = {
       const client: UserDatasource = dataSources.userApi;
       if (args.request.fname && args.request.lname && args.request.email && args.request.password) {
         const result = await client.createUser(args.request);
-        if (result instanceof ApolloError) {
+        if (result instanceof GraphQLError) {
           return result;
         }
         if (result && result.acknowledged && result.insertedId) {
@@ -17,10 +17,10 @@ export const Mutation = {
             success: true,
           };
         } else {
-          throw new ApolloError(`An error occurred trying to create your account.`);
+          throw new GraphQLError(`An error occurred trying to create your account.`);
         }
       } else {
-        throw new ApolloError(`All fields must be filled in.`);
+        throw new GraphQLError(`All fields must be filled in.`);
       }
     } catch (error) {
       return error;

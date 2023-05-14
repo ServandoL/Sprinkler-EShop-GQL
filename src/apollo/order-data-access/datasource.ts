@@ -1,5 +1,3 @@
-import { DataSource } from 'apollo-datasource';
-import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
 import {
   ClientSession,
@@ -17,15 +15,15 @@ import { Page } from '../../interfaces/interfaces';
 import { Cart } from '../cart-data-access/models/interfaces';
 import { IProduct } from '../products-data-access/models/interfaces';
 import { CartItem, Order, OrderHistoryRequest, SPCOrders } from './models/interfaces';
+import { GraphQLError } from 'graphql';
 
-export class OrderDatasource extends DataSource {
+export class OrderDatasource {
   client!: MongoClient;
   collection!: Collection<Order>;
   spcOrdersCollection!: Collection<SPCOrders>;
   db!: Db;
   loc = 'OrderDatasource';
   constructor(client: MongoClient) {
-    super();
     this.client = client;
     this.db = this.client.db(env.database);
     this.collection = this.db.collection(env.ordersCollection);
@@ -50,7 +48,7 @@ export class OrderDatasource extends DataSource {
     console.log(`${this.loc}.getOrders`, `aggregate: ${JSON.stringify(aggregate)}`);
     const [error, data] = await to(Paginate(this.collection, aggregate, pageOptions));
     if (error) {
-      throw new ApolloError(JSON.stringify(error));
+      throw new GraphQLError(JSON.stringify(error));
     } else {
       return data;
     }
@@ -74,7 +72,7 @@ export class OrderDatasource extends DataSource {
                 this.loc + '.saveCart',
                 `Error validating quantities for ${JSON.stringify(order)}`
               );
-              throw new ApolloError(error + ` Item: ${order.productName}`);
+              throw new GraphQLError(error + ` Item: ${order.productName}`);
             }
           }
           for (const order of request.order) {
@@ -101,7 +99,7 @@ export class OrderDatasource extends DataSource {
             this.collection.insertOne(doc, { session: transactionSession })
           );
           if (error) {
-            throw new ApolloError(
+            throw new GraphQLError(
               `An error occurred while processing your order. Please try again. ${JSON.stringify(
                 error
               )}`
@@ -131,7 +129,7 @@ export class OrderDatasource extends DataSource {
         })
       );
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while processing your order. Please try again. ${JSON.stringify(
             error
           )}`
@@ -140,7 +138,7 @@ export class OrderDatasource extends DataSource {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while processing your order. Please try again. ${JSON.stringify(error)}`
       );
     } finally {
@@ -161,21 +159,23 @@ export class OrderDatasource extends DataSource {
       );
 
       if (error) {
-        throw new ApolloError(`An error occurred while trying to validate quantities.`);
+        throw new GraphQLError(`An error occurred while trying to validate quantities.`);
       } else {
         if (!data) {
-          throw new ApolloError(`The product does not exists. ${JSON.stringify(request)}`);
+          throw new GraphQLError(`The product does not exists. ${JSON.stringify(request)}`);
         }
         if (request.quantity <= 0) {
-          throw new ApolloError(`You cannot have a quantity of 0 or lower.`);
+          throw new GraphQLError(`You cannot have a quantity of 0 or lower.`);
         }
         if (request.quantity > data.stock) {
-          throw new ApolloError(`Quantity ordered is greater than the available on hand quantity.`);
+          throw new GraphQLError(
+            `Quantity ordered is greater than the available on hand quantity.`
+          );
         }
         return true;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to validate quantities. ${JSON.stringify(error)}`
       );
     }

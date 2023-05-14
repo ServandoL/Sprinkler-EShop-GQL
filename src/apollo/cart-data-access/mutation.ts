@@ -1,6 +1,7 @@
-import { ApolloError } from 'apollo-server';
+import { GraphQLError } from 'graphql';
 import { CartDatasource } from './datasource';
 import { CartItem, SaveCartRequest } from './models/interfaces';
+import { AppContext } from '../../interfaces/interfaces';
 
 export const Mutation = {
   saveCart: async (
@@ -8,12 +9,12 @@ export const Mutation = {
     args: {
       request: SaveCartRequest;
     },
-    { dataSources }: any
+    { dataSources }: AppContext
   ) => {
     try {
       const client: CartDatasource = dataSources.cartApi;
       const result = await client.saveCart(args.request);
-      if (result instanceof ApolloError) {
+      if (result instanceof GraphQLError) {
         return result;
       }
       if (result) {
@@ -22,7 +23,7 @@ export const Mutation = {
           success: true,
         };
       }
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to save your cart. You can only have one cart saved at any time.`
       );
     } catch (error) {
@@ -39,7 +40,7 @@ export const Mutation = {
     try {
       const client: CartDatasource = dataSources.cartApi;
       const result = await client.addToCart(args.request);
-      if (result instanceof ApolloError) {
+      if (result instanceof GraphQLError) {
         return result;
       } else {
         if (result) {
@@ -48,7 +49,7 @@ export const Mutation = {
             success: true,
           };
         }
-        throw new ApolloError(`There was an error while trying to update your cart.`);
+        throw new GraphQLError(`There was an error while trying to update your cart.`);
       }
     } catch (error) {
       return error;
@@ -70,7 +71,7 @@ export const Mutation = {
           success: true,
         };
       }
-      throw new ApolloError(`No items in your cart to delete.`);
+      throw new GraphQLError(`No items in your cart to delete.`);
     } catch (error) {
       return error;
     }
@@ -85,7 +86,7 @@ export const Mutation = {
     try {
       const client: CartDatasource = dataSources.cartApi;
       const result = await client.updateCartQuantity(args.request);
-      if (result instanceof ApolloError) {
+      if (result instanceof GraphQLError) {
         return result;
       }
       if (result) {
@@ -94,7 +95,7 @@ export const Mutation = {
           success: true,
         };
       } else {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while trying to update your cart. Please try again.`
         );
       }

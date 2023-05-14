@@ -1,6 +1,4 @@
-import { gql } from 'apollo-server';
-
-export const CartTypeDefs = gql`
+export const CartTypeDefs = `#graphql
   type Query {
     getCart(userId: String): getCartResponse
   }

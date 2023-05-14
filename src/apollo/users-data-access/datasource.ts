@@ -1,17 +1,15 @@
-import { DataSource } from 'apollo-datasource';
-import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
 import { MongoClient, Collection, Db, Filter, ObjectId, UpdateFilter } from 'mongodb';
 import * as env from '../../../config';
 import { IUser, UpdateRequest } from './models/interfaces';
+import { GraphQLError } from 'graphql';
 
-export class UserDatasource extends DataSource {
+export class UserDatasource {
   client!: MongoClient;
   collection!: Collection<IUser>;
   db!: Db;
   loc = 'UserDatasource';
   constructor(client: MongoClient) {
-    super();
     this.client = client;
     this.db = this.client.db(env.database);
     this.collection = this.db.collection(env.usersCollection);
@@ -22,7 +20,7 @@ export class UserDatasource extends DataSource {
       const query: Filter<IUser> = { email, password };
       const [error, data] = await to(this.collection.findOne(query));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while retrieving your account. ${JSON.stringify(error)}`
         );
       } else {
@@ -38,7 +36,7 @@ export class UserDatasource extends DataSource {
         return undefined;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while retrieving your account. ${JSON.stringify(error)}`
       );
     }
@@ -49,7 +47,7 @@ export class UserDatasource extends DataSource {
       const query: Filter<IUser> = { email: user.email };
       const exists = await this.collection.findOne(query);
       if (exists) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `This email is already registered. ${JSON.stringify({
             error: 'User already exists.',
           })}`
@@ -63,14 +61,14 @@ export class UserDatasource extends DataSource {
         })
       );
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while creating your account. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while creating your account. ${JSON.stringify(error)}`
       );
     }
@@ -84,25 +82,27 @@ export class UserDatasource extends DataSource {
       };
       const [error, data] = await to(this.collection.findOne(query));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while trying to update your account. ${JSON.stringify(error)}`
         );
       } else {
         if (!data) {
-          throw new ApolloError(
+          throw new GraphQLError(
             `An error occurred while retrieving your account. Please verify your password.`
           );
         }
         if (request.newPassword) {
           if (request.newPassword === data.password) {
-            throw new ApolloError(`Your new password cannot be the same as your current password.`);
+            throw new GraphQLError(
+              `Your new password cannot be the same as your current password.`
+            );
           } else {
             data.password = request.newPassword;
           }
         }
         if (request.email) {
           if (request.email === data.email) {
-            throw new ApolloError(`Your new email cannot be the same as your current email.`);
+            throw new GraphQLError(`Your new email cannot be the same as your current email.`);
           } else {
             data.email = request.email;
           }
@@ -128,7 +128,7 @@ export class UserDatasource extends DataSource {
         }
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to update your account. ${JSON.stringify(error)}`
       );
     }
@@ -140,14 +140,14 @@ export class UserDatasource extends DataSource {
       console.log(query);
       const [error, data] = await to(this.collection.findOneAndDelete(query));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while trying to delete your account. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to delete your account. Please try again. ${JSON.stringify(
           error
         )}`

@@ -4,10 +4,13 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.ts",
+    "start": "npm run local-schema && npm run codegen && nodemon index.ts",
     "build": "npx tsc",
+    "debug": "npm run local-schema && npm run codegen && npm run build && env-cmd node --inspect dist/index.js",
     "lint": "npx eslint src",
-    "format": "npx prettier --write src"
+    "format": "npx prettier --write src",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "local-schema": "graphql-codegen --config local-schema.ts"
   },
   "repository": {
     "type": "git",
@@ -20,23 +23,27 @@
   },
   "homepage": "https://github.com/ServandoL/Sprinkler-EShop-GQL#readme",
   "dependencies": {
-    "apollo": "^2.33.9",
-    "apollo-datasource": "^3.3.0",
-    "apollo-server": "^3.5.0",
+    "@apollo/server": "^4.7.1",
     "await-to-js": "^3.0.0",
     "express": "^4.17.1",
-    "graphql": "^16.0.1",
+    "graphql": "^16.6.0",
     "mongodb": "^4.8.0",
     "nodemon": "^2.0.15"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "3.3.1",
+    "@graphql-codegen/schema-ast": "^3.0.1",
+    "@graphql-codegen/typescript": "3.0.4",
+    "@graphql-codegen/typescript-mongodb": "2.4.6",
+    "@graphql-codegen/typescript-resolvers": "3.2.1",
     "@types/node": "^16.11.9",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
+    "env-cmd": "^10.1.0",
     "eslint": "^8.23.0",
     "eslint-prettier-config": "^1.0.1",
     "prettier": "^2.7.1",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.5.2"
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
   }
 }

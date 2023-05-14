@@ -1,4 +1,3 @@
-import { DataSource } from 'apollo-datasource';
 import {
   MongoClient,
   Collection,
@@ -22,19 +21,18 @@ import {
   FindProductRequest,
 } from './models/interfaces';
 import * as env from '../../../config';
-import { ApolloError } from 'apollo-server';
 import to from 'await-to-js';
 import { BRAND, CATEGORIES, CATEGORY, PRICE_RANGE, RATING, SEARCH } from './constants';
 import { Page, PaginatedResponse } from '../../interfaces/interfaces';
 import { Paginate } from '../../common/pagination';
+import { GraphQLError } from 'graphql';
 
-export class ProductDatasource extends DataSource {
+export class ProductDatasource {
   client!: MongoClient;
   collection!: Collection<IProduct>;
   db!: Db;
   loc = 'ProductDatasource';
   constructor(client: MongoClient) {
-    super();
     this.client = client;
     this.db = this.client.db(env.database);
     this.collection = this.db.collection(env.newProducts);
@@ -49,7 +47,7 @@ export class ProductDatasource extends DataSource {
       };
       const [error, data] = await to(this.collection.find().toArray());
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while retrieving the product filters. ${JSON.stringify(error)}`
         );
       } else {
@@ -71,13 +69,15 @@ export class ProductDatasource extends DataSource {
         } as FilterResponse;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while retrieving the products. ${JSON.stringify(error)}`
       );
     }
   }
 
-  async getProducts(request: ProductRequest): Promise<PaginatedResponse | ApolloError | undefined> {
+  async getProducts(
+    request: ProductRequest
+  ): Promise<PaginatedResponse | GraphQLError | undefined> {
     try {
       const pageOptions: Page = {
         pageNumber: request.page.pageNumber,
@@ -97,14 +97,14 @@ export class ProductDatasource extends DataSource {
       const [error, data] = await to(Paginate(this.collection, searchAggregate, pageOptions));
 
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while retrieving the products. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while retrieving the products. ${JSON.stringify(error)}`
       );
     }
@@ -112,7 +112,7 @@ export class ProductDatasource extends DataSource {
 
   async getAllProducts(
     request: ProductRequest
-  ): Promise<PaginatedResponse | ApolloError | undefined> {
+  ): Promise<PaginatedResponse | GraphQLError | undefined> {
     try {
       const pageOptions: Page = {
         pageNumber: request.page.pageNumber,
@@ -125,14 +125,14 @@ export class ProductDatasource extends DataSource {
       ];
       const [error, data] = await to(Paginate(this.collection, searchAggregate, pageOptions));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while retrieving the products. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while retrieving the products. ${JSON.stringify(error)}`
       );
     }
@@ -140,7 +140,7 @@ export class ProductDatasource extends DataSource {
 
   async softDeleteProduct(
     request: DeleteRequest
-  ): Promise<ModifyResult<IProduct> | undefined | ApolloError> {
+  ): Promise<ModifyResult<IProduct> | undefined | GraphQLError> {
     try {
       const filter: Filter<IProduct> = {
         _id: new ObjectId(request.product._id),
@@ -154,14 +154,14 @@ export class ProductDatasource extends DataSource {
       };
       const [error, data] = await to(this.collection.findOneAndUpdate(filter, update));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while retrieving the products. ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while retrieving the products. ${JSON.stringify(error)}`
       );
     }
@@ -179,14 +179,14 @@ export class ProductDatasource extends DataSource {
         })
       );
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `'An error occurred trying to add the product.' ${JSON.stringify(error)}`
         );
       } else {
         return data;
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `'An error occurred trying to add the product.' ${JSON.stringify(error)}`
       );
     }
@@ -198,7 +198,7 @@ export class ProductDatasource extends DataSource {
       const filter: Filter<IProduct> = { _id: new ObjectId(request.productId) };
       const [error, data] = await to(this.collection.findOne(filter));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while trying to update this product. ${JSON.stringify(error)}`
         );
       } else {
@@ -225,7 +225,7 @@ export class ProductDatasource extends DataSource {
         }
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to update this product. ${JSON.stringify(error)}`
       );
     }
@@ -252,7 +252,7 @@ export class ProductDatasource extends DataSource {
       const filter: Filter<IProduct> = { _id: new ObjectId(request.productId) };
       const [error, data] = await to(this.collection.findOne(filter));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while trying to review this product. ${JSON.stringify(error)}`
         );
       } else {
@@ -278,7 +278,7 @@ export class ProductDatasource extends DataSource {
               product: product,
             };
           } else {
-            throw new ApolloError('An error occurred while updating your product.');
+            throw new GraphQLError('An error occurred while updating your product.');
           }
         } else {
           const update: UpdateFilter<IProduct> = {
@@ -297,12 +297,12 @@ export class ProductDatasource extends DataSource {
               product: product,
             };
           } else {
-            throw new ApolloError('An error occurred while updating your product.');
+            throw new GraphQLError('An error occurred while updating your product.');
           }
         }
       }
     } catch (error) {
-      throw new ApolloError(
+      throw new GraphQLError(
         `An error occurred while trying to review this product. ${JSON.stringify(error)}`
       );
     }
@@ -313,12 +313,12 @@ export class ProductDatasource extends DataSource {
     try {
       const [error, data] = await to(this.collection.findOne(filter));
       if (error) {
-        throw new ApolloError('An error occurred trying to fetch the product.');
+        throw new GraphQLError('An error occurred trying to fetch the product.');
       } else {
         return data ? { product: data } : null;
       }
     } catch (error) {
-      throw new ApolloError('An error occured trying to fetch the product.');
+      throw new GraphQLError('An error occured trying to fetch the product.');
     }
   }
 
@@ -371,7 +371,7 @@ export class ProductDatasource extends DataSource {
     try {
       const [error, data] = await to(Paginate(this.collection, [{ $match: filter }], pageOptions));
       if (error) {
-        throw new ApolloError(
+        throw new GraphQLError(
           `An error occurred while retrieving the products. ${JSON.stringify(error)}`
         );
       } else {
@@ -379,7 +379,7 @@ export class ProductDatasource extends DataSource {
         return data;
       }
     } catch (error) {
-      throw new ApolloError('An error occured trying to fetch the product.');
+      throw new GraphQLError('An error occured trying to fetch the product.');
     }
   }
 }

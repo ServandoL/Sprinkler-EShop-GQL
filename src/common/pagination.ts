@@ -1,6 +1,6 @@
-import { ApolloError } from 'apollo-server';
 import { Collection, Document } from 'mongodb';
 import { Page, PaginatedResponse } from '../interfaces/interfaces';
+import { GraphQLError } from 'graphql';
 
 export async function Paginate(
   collection: Collection<any>,
@@ -43,7 +43,7 @@ export async function Paginate(
     return response;
   } catch (error) {
     console.log('Paginate', 'Mongo error occurred while fetching results.');
-    throw new ApolloError(JSON.stringify(error));
+    throw new GraphQLError(JSON.stringify(error));
   }
 }
 
@@ -66,6 +66,6 @@ async function countDocuments(collection: Collection, aggregate: Document[]) {
     return count[0].totalElements as number;
   } catch (error) {
     console.log('countDocuments', 'Mongo error occurred while counting all documents.');
-    throw new ApolloError(JSON.stringify(error));
+    throw new GraphQLError(JSON.stringify(error));
   }
 }
